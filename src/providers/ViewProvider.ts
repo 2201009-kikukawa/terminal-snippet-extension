@@ -25,6 +25,44 @@ export class ViewProvider implements WebviewViewProvider {
     };
 
     webviewView.webview.html = this._getWebviewContent(webviewView.webview, this._extensionUri);
+
+    webviewView.webview.onDidReceiveMessage(async (message) => {
+  const fs = await import("fs");
+  const path = await import("path");
+
+  const folderPath = this._extensionUri.with({ scheme: "vscode-storage" });
+  const snippetsFile = Uri.joinPath(folderPath, "snippets.json").fsPath;
+
+  if (message.type === "addSnippet") {
+    try {
+      let snippets = [];
+      if (fs.existsSync(snippetsFile)) {
+        const content = fs.readFileSync(snippetsFile, "utf8");
+        snippets = JSON.parse(content);
+      }
+
+      snippets.push(message.value);
+      fs.writeFileSync(snippetsFile, JSON.stringify(snippets, null, 2), "utf8");
+      console.log("スニペット保存成功");
+    } catch (error) {
+      console.error("スニペット保存失敗", error);
+    }
+  } else if (message.type === "getSnippets") {
+    try {
+      let snippets = [];
+      if (fs.existsSync(snippetsFile)) {
+        const content = fs.readFileSync(snippetsFile, "utf8");
+        snippets = JSON.parse(content);
+      }
+      webviewView.webview.postMessage({
+        type: "snippetsData",
+        value: snippets,
+      });
+    } catch (error) {
+      console.error("スニペット読み込み失敗", error);
+    }
+  }
+});
   }
 
   private _getWebviewContent(webview: Webview, extensionUri: Uri) {
