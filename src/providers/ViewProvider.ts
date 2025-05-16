@@ -27,42 +27,78 @@ export class ViewProvider implements WebviewViewProvider {
     webviewView.webview.html = this._getWebviewContent(webviewView.webview, this._extensionUri);
 
     webviewView.webview.onDidReceiveMessage(async (message) => {
-  const fs = await import("fs");
-  const path = await import("path");
 
-  const folderPath = this._extensionUri.with({ scheme: "vscode-storage" });
-  const snippetsFile = Uri.joinPath(folderPath, "snippets.json").fsPath;
+      const fs = await import("fs");
 
-  if (message.type === "addSnippet") {
-    try {
-      let snippets = [];
-      if (fs.existsSync(snippetsFile)) {
-        const content = fs.readFileSync(snippetsFile, "utf8");
-        snippets = JSON.parse(content);
+      const folderPath = this._extensionUri.with({ scheme: "vscode-storage" });
+      const snippetsFile = Uri.joinPath(folderPath, "snippets.json").fsPath;
+
+      if (message.type === "addSnippet") {
+        try {
+          let snippets = [];
+          if (fs.existsSync(snippetsFile)) {
+            const content = fs.readFileSync(snippetsFile, "utf8");
+            snippets = JSON.parse(content);
+          }
+
+          snippets.push(message.value);
+          fs.writeFileSync(snippetsFile, JSON.stringify(snippets, null, 2), "utf8");
+          console.log("スニペット保存成功");
+        } catch (error) {
+          console.error("スニペット保存失敗", error);
+        }
+
+      } else if (message.type === "getSnippets") {
+        try {
+          let snippets = [];
+          if (fs.existsSync(snippetsFile)) {
+            const content = fs.readFileSync(snippetsFile, "utf8");
+            snippets = JSON.parse(content);
+          }
+          webviewView.webview.postMessage({
+            type: "snippetsData",
+            value: snippets,
+          });
+        } catch (error) {
+          console.error("スニペット読み込み失敗", error);
+        }
+
+      }else if (message.type === "runSnippet") {  // ★ 追加：スニペットの実行
+        try {
+          const vscode = await import("vscode");
+          const terminal = vscode.window.activeTerminal || vscode.window.createTerminal("Snippet Terminal");
+          terminal.show();
+          terminal.sendText(message.value, false); // false で改行なし（貼り付けのみ）
+        } catch (error) {
+          console.error("ターミナルへの送信失敗", error);
+        }
+
+      }else if (message.type === "deleteSnippet") {
+        try {
+          let snippets = [];
+          if (fs.existsSync(snippetsFile)) {
+            const content = fs.readFileSync(snippetsFile, "utf8");
+            snippets = JSON.parse(content);
+          }
+
+          // name と command 両方が一致するものを除外
+          snippets = snippets.filter(
+            (s: any) => s.name !== message.value.name || s.command !== message.value.command
+          );
+
+          fs.writeFileSync(snippetsFile, JSON.stringify(snippets, null, 2), "utf8");
+          console.log("スニペット削除成功");
+
+          // フロントへ更新通知（任意：なくても問題ない）
+          webviewView.webview.postMessage({
+            type: "snippetsData",
+            value: snippets,
+          });
+        } catch (error) {
+          console.error("スニペット削除失敗", error);
+        }
       }
-
-      snippets.push(message.value);
-      fs.writeFileSync(snippetsFile, JSON.stringify(snippets, null, 2), "utf8");
-      console.log("スニペット保存成功");
-    } catch (error) {
-      console.error("スニペット保存失敗", error);
-    }
-  } else if (message.type === "getSnippets") {
-    try {
-      let snippets = [];
-      if (fs.existsSync(snippetsFile)) {
-        const content = fs.readFileSync(snippetsFile, "utf8");
-        snippets = JSON.parse(content);
-      }
-      webviewView.webview.postMessage({
-        type: "snippetsData",
-        value: snippets,
-      });
-    } catch (error) {
-      console.error("スニペット読み込み失敗", error);
-    }
-  }
-});
+    });
   }
 
   private _getWebviewContent(webview: Webview, extensionUri: Uri) {

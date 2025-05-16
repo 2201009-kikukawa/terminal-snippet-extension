@@ -2,17 +2,6 @@ import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import { VSCodeButton } from "@vscode/webview-ui-toolkit/react";
 
-// const main = () => {
-//   const [text, setText] = useState<string>("");
-
-//   return (
-//     <>
-//       <VSCodeButton onClick={(e) => setText("ボタンがクリックされました")}>新規追加</VSCodeButton>
-//       <div>{text}</div>
-//     </>
-//   );
-// };
-
 declare const acquireVsCodeApi: any;
 const vscode = acquireVsCodeApi();
 
@@ -63,14 +52,40 @@ useEffect(() => {
           <p>スニペットはまだありません</p>
         ) : (
           snippets.map((snippet, index) => (
-            <VSCodeButton key={index} appearance="secondary">
-              {snippet.name}
-            </VSCodeButton>
+            <div key={index} style={{ display: "flex", alignItems: "center", gap: "0.5em" }}>
+              <VSCodeButton
+                appearance="secondary"
+                onClick={() => {
+                  vscode.postMessage({
+                    type: "runSnippet",
+                    value: snippet.command,
+                  });
+                }}
+              >
+                {snippet.name}
+              </VSCodeButton>
+
+              <VSCodeButton
+                appearance="icon"
+                title="削除"
+                onClick={() => {
+
+                  vscode.postMessage({
+                    type: "deleteSnippet",
+                    value: snippet, // name + command 両方送信
+                  });
+
+                  // フロント側からも即座に消す（仮想的な同期）
+                  setSnippets(snippets.filter((_, i) => i !== index));
+                }}
+              >
+                🗑️
+              </VSCodeButton>
+            </div>
           ))
         )}
       </div>
 
-      {/* <VSCodeButton onClick={() => setShowForm(true)}>新規追加</VSCodeButton> */}
       <VSCodeButton appearance="icon" onClick={() => setShowForm(true)}>
         <span style={{ fontSize: "1.2em", fontWeight: "bold", lineHeight: "1" }}>＋</span>
       </VSCodeButton>
@@ -82,7 +97,6 @@ useEffect(() => {
           <input id="snippetCommand" type="text" placeholder="追加コマンド" style={{ width: "100%", marginBottom: "0.5em" }} />
 
           <br />
-          {/* <VSCodeButton onClick={() => setShowForm(false)}>閉じる</VSCodeButton> */}
           <div style={{ display: "flex", gap: "0.5em", justifyContent: "flex-end" }}>
             <VSCodeButton onClick={handleRegister}>登録</VSCodeButton>
             <VSCodeButton onClick={() => setShowForm(false)}>閉じる</VSCodeButton>
