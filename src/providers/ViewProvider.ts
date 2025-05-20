@@ -6,6 +6,7 @@ import {
   WebviewViewProvider,
   WebviewViewResolveContext,
 } from "vscode";
+import * as fs from "fs";
 import { getUri } from "../utilities/getUri";
 import { getNonce } from "../utilities/getNonce";
 
@@ -27,8 +28,6 @@ export class ViewProvider implements WebviewViewProvider {
     webviewView.webview.html = this._getWebviewContent(webviewView.webview, this._extensionUri);
 
     webviewView.webview.onDidReceiveMessage(async (message) => {
-
-      const fs = await import("fs");
 
       const folderPath = this._extensionUri.with({ scheme: "vscode-storage" });
       const snippetsFile = Uri.joinPath(folderPath, "snippets.json").fsPath;

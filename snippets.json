@@ -2,5 +2,9 @@
   {
     "name": "test",
     "command": "test"
+  },
+  {
+    "name": "test2",
+    "command": "test2"
   }
 ]

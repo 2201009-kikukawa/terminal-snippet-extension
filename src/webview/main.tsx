@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom/client";
-import { VSCodeButton } from "@vscode/webview-ui-toolkit/react";
+import { VSCodeButton, VSCodeTextField, } from "@vscode/webview-ui-toolkit/react";
 
 declare const acquireVsCodeApi: any;
 const vscode = acquireVsCodeApi();
@@ -93,8 +93,8 @@ useEffect(() => {
       {showForm && (
         <div style={{ marginTop: "1em", border: "1px solid #ccc", padding: "1em" }}>
           <h3>新規登録フォーム</h3>
-          <input id="snippetName" type="text" placeholder="スニペット名" style={{ width: "100%", marginBottom: "0.5em" }} />
-          <input id="snippetCommand" type="text" placeholder="追加コマンド" style={{ width: "100%", marginBottom: "0.5em" }} />
+          <VSCodeTextField id="snippetName"  placeholder="スニペット名" style={{ width: "100%", marginBottom: "0.5em" }} />
+          <VSCodeTextField id="snippetCommand"  placeholder="追加コマンド" style={{ width: "100%", marginBottom: "0.5em" }} />
 
           <br />
           <div style={{ display: "flex", gap: "0.5em", justifyContent: "flex-end" }}>
