@@ -5,6 +5,7 @@ import {
   WebviewView,
   WebviewViewProvider,
   WebviewViewResolveContext,
+  ExtensionContext,
 } from "vscode";
 import { getUri } from "../utilities/getUri";
 import { getNonce } from "../utilities/getNonce";
@@ -13,7 +14,7 @@ import { SnippetEventListener } from "../listener/SnippetEventListener";
 export class ViewProvider implements WebviewViewProvider {
   public static readonly viewType = "sample-id";
 
-  constructor(private readonly _extensionUri: Uri) {}
+  constructor(private readonly _context: ExtensionContext) {}
 
   public resolveWebviewView(
     webviewView: WebviewView,
@@ -22,15 +23,15 @@ export class ViewProvider implements WebviewViewProvider {
   ) {
     webviewView.webview.options = {
       enableScripts: true,
-      localResourceRoots: [Uri.joinPath(this._extensionUri, "out")],
+      localResourceRoots: [Uri.joinPath(this._context.extensionUri, "out")],
     };
 
-    webviewView.webview.html = this._getWebviewContent(webviewView.webview, this._extensionUri);
+    webviewView.webview.html = this._getWebviewContent(webviewView.webview, this._context.extensionUri);
 
-    const listener = new SnippetEventListener(this._extensionUri);
+    const listener = new SnippetEventListener(this._context);
     listener.setWebviewMessageListener(webviewView);
   }
-  
+
 
   private _getWebviewContent(webview: Webview, extensionUri: Uri) {
     const webviewUri = getUri(webview, extensionUri, ["out", "webview.js"]);

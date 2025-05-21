@@ -1,13 +1,19 @@
-import { WebviewView, Uri, window } from "vscode";
+import { WebviewView, Uri, ExtensionContext } from "vscode";
 import * as fs from "fs";
 import * as vscode from "vscode";
+import * as path from "path";
 
 export class SnippetEventListener {
   private readonly snippetsFile: string;
 
-  constructor(private readonly extensionUri: Uri) {
-    const folderPath = this.extensionUri.with({ scheme: "vscode-storage" });
-    this.snippetsFile = Uri.joinPath(folderPath, "snippets.json").fsPath;
+  constructor(private readonly context: ExtensionContext) {
+    const fileUri = Uri.joinPath(context.globalStorageUri, "snippets.json");
+    this.snippetsFile = fileUri.fsPath;
+
+    const dirPath = path.dirname(this.snippetsFile);
+    if (!fs.existsSync(dirPath)) {
+      fs.mkdirSync(dirPath, { recursive: true });
+    }
   }
 
   public setWebviewMessageListener(webviewView: WebviewView) {
