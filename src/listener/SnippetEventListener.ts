@@ -69,7 +69,7 @@ export class SnippetEventListener {
     try {
       const terminal = vscode.window.activeTerminal || vscode.window.createTerminal("Snippet Terminal");
       terminal.show();
-      terminal.sendText(command, false);
+      terminal.sendText(command, true);
     } catch (error) {
       console.error("ターミナルへの送信失敗", error);
     }
