@@ -7,6 +7,7 @@ import {
   WebviewViewResolveContext,
 } from "vscode";
 import * as fs from "fs";
+import * as vscode from "vscode";
 import { getUri } from "../utilities/getUri";
 import { getNonce } from "../utilities/getNonce";
 
@@ -64,7 +65,6 @@ export class ViewProvider implements WebviewViewProvider {
 
       }else if (message.type === "runSnippet") {  // ★ 追加：スニペットの実行
         try {
-          const vscode = await import("vscode");
           const terminal = vscode.window.activeTerminal || vscode.window.createTerminal("Snippet Terminal");
           terminal.show();
           terminal.sendText(message.value, false); // false で改行なし（貼り付けのみ）
