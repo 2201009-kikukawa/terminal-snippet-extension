@@ -15,6 +15,11 @@ export class SnippetEventListener {
     if (!fs.existsSync(dirPath)) {
       fs.mkdirSync(dirPath, { recursive: true });
     }
+
+    // 初回作成時に空ファイルを用意（なければ）
+    if (!fs.existsSync(this.snippetsFile)) {
+      fs.writeFileSync(this.snippetsFile, JSON.stringify([], null, 2), "utf8");
+    }
   }
 
   public setWebviewMessageListener(webviewView: WebviewView) {
@@ -42,14 +47,14 @@ export class SnippetEventListener {
 
   private async handleAddSnippet(value: { name: string; command: string }) {
     try {
-      let snippets = [];
-      if (fs.existsSync(this.snippetsFile)) {
-        const content = fs.readFileSync(this.snippetsFile, "utf8");
-        snippets = JSON.parse(content);
+      if (!fs.existsSync(this.snippetsFile)) {
+        return console.error("スニペットファイルが存在しません");
       }
 
-      snippets.push(value);
-      fs.writeFileSync(this.snippetsFile, JSON.stringify(snippets, null, 2), "utf8");
+      const currentSnippets = JSON.parse(fs.readFileSync(this.snippetsFile, "utf8"));
+      const updatedSnippets = [...currentSnippets, value];
+      
+      fs.writeFileSync(this.snippetsFile, JSON.stringify(updatedSnippets, null, 2), "utf8");
       console.log("スニペット保存成功");
     } catch (error) {
       console.error("スニペット保存失敗", error);
@@ -58,11 +63,13 @@ export class SnippetEventListener {
 
   private handleGetSnippets(webviewView: WebviewView) {
     try {
-      let snippets = [];
-      if (fs.existsSync(this.snippetsFile)) {
-        const content = fs.readFileSync(this.snippetsFile, "utf8");
-        snippets = JSON.parse(content);
+      if (!fs.existsSync(this.snippetsFile)) {
+        return console.error("スニペットファイルが存在しません");
       }
+
+      const content = fs.readFileSync(this.snippetsFile, "utf8");
+      const snippets = JSON.parse(content);
+
       webviewView.webview.postMessage({
         type: EventTypes.SnippetsData,
         value: snippets,
@@ -84,22 +91,23 @@ export class SnippetEventListener {
 
   private handleDeleteSnippet(value: { name: string; command: string }, webviewView: WebviewView) {
     try {
-      let snippets = [];
-      if (fs.existsSync(this.snippetsFile)) {
-        const content = fs.readFileSync(this.snippetsFile, "utf8");
-        snippets = JSON.parse(content);
+      if (!fs.existsSync(this.snippetsFile)) {
+        return console.error("スニペットファイルが存在しません");
       }
 
-      snippets = snippets.filter(
+      const content = fs.readFileSync(this.snippetsFile, "utf8");
+      const currentSnippets = JSON.parse(content);
+
+      const updatedSnippets = currentSnippets.filter(
         (s: any) => s.name !== value.name || s.command !== value.command
       );
 
-      fs.writeFileSync(this.snippetsFile, JSON.stringify(snippets, null, 2), "utf8");
+      fs.writeFileSync(this.snippetsFile, JSON.stringify(updatedSnippets, null, 2), "utf8");
       console.log("スニペット削除成功");
 
       webviewView.webview.postMessage({
         type: EventTypes.SnippetsData,
-        value: snippets,
+        value: updatedSnippets,
       });
     } catch (error) {
       console.error("スニペット削除失敗", error);
