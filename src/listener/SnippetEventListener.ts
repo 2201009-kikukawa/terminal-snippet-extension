@@ -2,6 +2,7 @@ import { WebviewView, Uri, ExtensionContext } from "vscode";
 import * as fs from "fs";
 import * as vscode from "vscode";
 import * as path from "path";
+import { EventTypes } from "../types/eventTypes";
 
 export class SnippetEventListener {
   private readonly snippetsFile: string;
@@ -20,19 +21,19 @@ export class SnippetEventListener {
     webviewView.webview.onDidReceiveMessage(async (message) => {
 
       switch (message.type) {
-        case "addSnippet":
+        case EventTypes.AddSnippet:
           await this.handleAddSnippet(message.value);
           break;
 
-        case "getSnippets":
+        case EventTypes.GetSnippets:
           this.handleGetSnippets(webviewView);
           break;
 
-        case "runSnippet":
+        case EventTypes.RunSnippet:
           this.handleRunSnippet(message.value);
           break;
 
-        case "deleteSnippet":
+        case EventTypes.DeleteSnippet:
           this.handleDeleteSnippet(message.value, webviewView);
           break;
       }
@@ -63,7 +64,7 @@ export class SnippetEventListener {
         snippets = JSON.parse(content);
       }
       webviewView.webview.postMessage({
-        type: "snippetsData",
+        type: EventTypes.SnippetsData,
         value: snippets,
       });
     } catch (error) {
@@ -97,7 +98,7 @@ export class SnippetEventListener {
       console.log("スニペット削除成功");
 
       webviewView.webview.postMessage({
-        type: "snippetsData",
+        type: EventTypes.SnippetsData,
         value: snippets,
       });
     } catch (error) {

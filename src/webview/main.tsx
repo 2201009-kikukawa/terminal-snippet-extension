@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ReactDOM from "react-dom/client";
 import { VSCodeButton, VSCodeTextField, } from "@vscode/webview-ui-toolkit/react";
+import { EventTypes } from "../types/eventTypes";
 
 declare const acquireVsCodeApi: any;
 const vscode = acquireVsCodeApi();
@@ -20,7 +21,7 @@ const main = () => {
 
   // WebView→拡張機能へメッセージ送信
   vscode.postMessage({
-    type: "addSnippet",
+    type: EventTypes.AddSnippet,
     value: {
       name: snippetName,
       command: snippetCommand,
@@ -34,11 +35,11 @@ const main = () => {
 };
 
 useEffect(() => {
-    vscode.postMessage({ type: "getSnippets" });
+    vscode.postMessage({ type: EventTypes.GetSnippets });
 
     window.addEventListener("message", (event) => {
       const message = event.data;
-      if (message.type === "snippetsData") {
+      if (message.type === EventTypes.SnippetsData) {
         setSnippets(message.value);
       }
     });
@@ -57,7 +58,7 @@ useEffect(() => {
                 appearance="secondary"
                 onClick={() => {
                   vscode.postMessage({
-                    type: "runSnippet",
+                    type: EventTypes.RunSnippet,
                     value: snippet.command,
                   });
                 }}
@@ -71,7 +72,7 @@ useEffect(() => {
                 onClick={() => {
 
                   vscode.postMessage({
-                    type: "deleteSnippet",
+                    type: EventTypes.DeleteSnippet,
                     value: snippet, // name + command 両方送信
                   });
 
