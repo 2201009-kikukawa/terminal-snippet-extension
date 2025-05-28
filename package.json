@@ -21,7 +21,7 @@
         {
           "type": "webview",
           "id": "terminalSnippet-id",
-          "name": "terminalSnippet-name"
+          "name": "View"
         }
       ]
     },
@@ -29,8 +29,8 @@
       "activitybar": [
         {
           "id": "terminalSnippet-id",
-          "title": "terminalSnippet-title",
-          "icon": "./resources/webview_icon.svg"
+          "title": "terminalSnippet",
+          "icon": "./resources/codicon--send.svg"
         }
       ]
     }
