@@ -12,7 +12,7 @@ import { getNonce } from "../utilities/getNonce";
 import { SnippetEventListener } from "../listener/SnippetEventListener";
 
 export class ViewProvider implements WebviewViewProvider {
-  public static readonly viewType = "sample-id";
+  public static readonly viewType = "terminalSnippet-id";
 
   constructor(private readonly _context: ExtensionContext) {}
 
@@ -26,12 +26,14 @@ export class ViewProvider implements WebviewViewProvider {
       localResourceRoots: [Uri.joinPath(this._context.extensionUri, "out")],
     };
 
-    webviewView.webview.html = this._getWebviewContent(webviewView.webview, this._context.extensionUri);
+    webviewView.webview.html = this._getWebviewContent(
+      webviewView.webview,
+      this._context.extensionUri
+    );
 
     const listener = new SnippetEventListener(this._context);
     listener.setWebviewMessageListener(webviewView);
   }
-
 
   private _getWebviewContent(webview: Webview, extensionUri: Uri) {
     const webviewUri = getUri(webview, extensionUri, ["out", "webview.js"]);
