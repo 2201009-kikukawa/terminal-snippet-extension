@@ -1,12 +1,12 @@
 {
-  "name": "sample-extension-04251226",
-  "displayName": "sample displayName",
-  "description": "sample description",
+  "name": "terminalSnippet-extension-04251226",
+  "displayName": "terminalSnippet displayName",
+  "description": "terminalSnippet description",
   "version": "0.0.1",
   "publisher": "VS-Modules",
   "repository": {
     "type": "git",
-    "url": "https://github.com/2201009-kikukawa/Sample-extension"
+    "url": "https://github.com/2201009-kikukawa/terminalSnippet-extension"
   },
   "engines": {
     "vscode": "^1.93.1"
@@ -17,20 +17,20 @@
   ],
   "contributes": {
     "views": {
-      "sample-id": [
+      "terminalSnippet-id": [
         {
           "type": "webview",
-          "id": "sample-id",
-          "name": "sample-name"
+          "id": "terminalSnippet-id",
+          "name": "View"
         }
       ]
     },
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "sample-id",
-          "title": "sample-title",
-          "icon": "./resources/webview_icon.svg"
+          "id": "terminalSnippet-id",
+          "title": "terminalSnippet",
+          "icon": "./resources/codicon--send.svg"
         }
       ]
     }
