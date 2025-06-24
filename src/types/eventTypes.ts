@@ -3,7 +3,7 @@ export enum EventTypes {
   GetSnippets = "getSnippets",
   RunSnippet = "runSnippet",
   DeleteSnippet = "deleteSnippet",
-  SnippetsData = "snippetsData"
+  SnippetsData = "snippetsData",
 }
 
 export type VSCodeEvent = {
