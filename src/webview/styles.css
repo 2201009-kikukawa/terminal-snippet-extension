@@ -1,0 +1,37 @@
+.snippet-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  margin-bottom: 1em;
+}
+
+.snippet-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.add-button-icon {
+  font-size: 1.2em;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.form-container {
+  margin-top: 1em;
+  /* VSCodeのテーマに合わせた枠線色 */
+  border: 1px solid var(--vscode-settings-sashBorder); 
+  padding: 1em;
+}
+
+.form-textfield {
+  display: block; /* VSCodeTextFieldはインライン要素なのでブロック要素にする */
+  width: 100%;
+  margin-bottom: 0.5em;
+}
+
+.form-actions {
+  display: flex;
+  gap: 0.5em;
+  justify-content: flex-end;
+}

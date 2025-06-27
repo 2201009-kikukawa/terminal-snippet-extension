@@ -48,14 +48,15 @@ useEffect(() => {
   return (
     <>
     {/* スニペット一覧（ボタン形式） */}
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.5em", marginBottom: "1em" }}>
+      <div className="snippet-list">
         {snippets.length === 0 ? (
           <p>スニペットはまだありません</p>
         ) : (
           snippets.map((snippet, index) => (
-            <div key={index} style={{ display: "flex", alignItems: "center", gap: "0.5em" }}>
-              <VSCodeButton
+            <div key={index} className="snippet-item">
+             <VSCodeButton
                 appearance="secondary"
+                title={snippet.command}
                 onClick={() => {
                   vscode.postMessage({
                     type: EventTypes.RunSnippet,
@@ -88,17 +89,17 @@ useEffect(() => {
       </div>
 
       <VSCodeButton appearance="icon" onClick={() => setShowForm(true)}>
-        <span style={{ fontSize: "1.2em", fontWeight: "bold", lineHeight: "1" }}>＋</span>
+        <span className="add-button-icon">＋</span>
       </VSCodeButton>
 
       {showForm && (
-        <div style={{ marginTop: "1em", border: "1px solid #ccc", padding: "1em" }}>
+        <div className="form-container">
           <h3>新規登録フォーム</h3>
-          <VSCodeTextField id="snippetName"  placeholder="スニペット名" style={{ width: "100%", marginBottom: "0.5em" }} />
-          <VSCodeTextField id="snippetCommand"  placeholder="追加コマンド" style={{ width: "100%", marginBottom: "0.5em" }} />
+          <VSCodeTextField id="snippetName"  placeholder="スニペット名" className="form-textfield" />
+          <VSCodeTextField id="snippetCommand"  placeholder="追加コマンド" className="form-textfield" />
 
           <br />
-          <div style={{ display: "flex", gap: "0.5em", justifyContent: "flex-end" }}>
+          <div className="form-actions">
             <VSCodeButton onClick={handleRegister}>登録</VSCodeButton>
             <VSCodeButton onClick={() => setShowForm(false)}>閉じる</VSCodeButton>
           </div>
