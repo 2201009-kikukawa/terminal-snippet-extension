@@ -1,15 +1,14 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
 import { VSCodeButton } from "@vscode/webview-ui-toolkit/react";
-import { useSnippets, useMenu } from "./hooks";
-import { SnippetList, SnippetForm } from "./components";
+import { useSnippets } from "./hooks";
+import { SnippetList, SnippetForm, MeatballMenuProvider } from "./components";
 import { Snippet } from "./types";
 import "./styles.css";
 
 const App: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const { snippets, addSnippet, deleteSnippet, runSnippet } = useSnippets();
-  const { openMenuIndex, selectedMenuItem, toggleMenu, selectMenuItem } = useMenu();
 
   const handleAddSnippet = (snippet: Snippet) => {
     addSnippet(snippet);
@@ -26,22 +25,18 @@ const App: React.FC = () => {
   };
 
   return (
-    <>
+    <MeatballMenuProvider>
       <SnippetList
         snippets={snippets}
         onRunSnippet={runSnippet}
         onEditSnippet={handleEditSnippet}
         onDeleteSnippet={handleDeleteSnippet}
-        openMenuIndex={openMenuIndex}
-        selectedMenuItem={selectedMenuItem}
-        onMenuToggle={toggleMenu}
-        onMenuItemSelect={selectMenuItem}
       />
       <VSCodeButton appearance="icon" onClick={() => setShowForm(true)}>
         <span className="add-button-icon">＋</span>
       </VSCodeButton>{" "}
       {showForm && <SnippetForm onSubmit={handleAddSnippet} onCancel={() => setShowForm(false)} />}
-    </>
+    </MeatballMenuProvider>
   );
 };
 

@@ -1,6 +1,6 @@
 import React from "react";
 import { VSCodeButton } from "@vscode/webview-ui-toolkit/react";
-import MeatballMenu from "./MeatballMenu";
+import { MeatballMenu } from "./meatball";
 import { Snippet } from "../types";
 
 interface SnippetListProps {
@@ -8,10 +8,6 @@ interface SnippetListProps {
   onRunSnippet: (command: string) => void;
   onEditSnippet: (snippet: Snippet, index: number) => void;
   onDeleteSnippet: (snippet: Snippet, index: number) => void;
-  openMenuIndex: number | null;
-  selectedMenuItem: string;
-  onMenuToggle: (index: number) => void;
-  onMenuItemSelect: (item: string) => void;
 }
 
 const SnippetList: React.FC<SnippetListProps> = ({
@@ -19,18 +15,13 @@ const SnippetList: React.FC<SnippetListProps> = ({
   onRunSnippet,
   onEditSnippet,
   onDeleteSnippet,
-  openMenuIndex,
-  onMenuToggle,
-  onMenuItemSelect,
 }) => {
-  const handleMenuItemClick = (action: string, snippet: Snippet, index: number) => {
-    onMenuItemSelect(action);
+  const handleDelete = (snippet: Snippet, index: number) => {
+    onDeleteSnippet(snippet, index);
+  };
 
-    if (action === "削除") {
-      onDeleteSnippet(snippet, index);
-    } else if (action === "編集") {
-      onEditSnippet(snippet, index);
-    }
+  const handleEdit = (snippet: Snippet, index: number) => {
+    onEditSnippet(snippet, index);
   };
 
   if (snippets.length === 0) {
@@ -48,18 +39,17 @@ const SnippetList: React.FC<SnippetListProps> = ({
             {snippet.name}
           </VSCodeButton>
           <MeatballMenu
+            id={`snippet-${index}`} //現在はmapのindexを使用。いずれuuidで判断するように修正
             menuItems={[
               {
                 label: "削除",
-                onClick: () => handleMenuItemClick("削除", snippet, index),
+                onClick: () => handleDelete(snippet, index),
               },
               {
                 label: "編集",
-                onClick: () => handleMenuItemClick("編集", snippet, index),
+                onClick: () => handleEdit(snippet, index),
               },
             ]}
-            isOpen={openMenuIndex === index}
-            onToggle={() => onMenuToggle(index)}
           />
         </div>
       ))}

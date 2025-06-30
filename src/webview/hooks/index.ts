@@ -47,17 +47,4 @@ export const useSnippets = () => {
   return { snippets, addSnippet, deleteSnippet, runSnippet };
 };
 
-export const useMenu = () => {
-  const [openMenuIndex, setOpenMenuIndex] = useState<number | null>(null);
-  const [selectedMenuItem, setSelectedMenuItem] = useState<string>("");
 
-  const toggleMenu = (index: number) => {
-    setOpenMenuIndex(openMenuIndex === index ? null : index);
-  };
-
-  const selectMenuItem = (item: string) => {
-    setSelectedMenuItem(item);
-  };
-
-  return { openMenuIndex, selectedMenuItem, toggleMenu, selectMenuItem };
-};
