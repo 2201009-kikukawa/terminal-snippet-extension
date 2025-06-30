@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { VSCodeButton, VSCodeTextField } from "@vscode/webview-ui-toolkit/react";
+import { TextField, Button } from "./common";
 import { Snippet } from "../types";
 
 interface SnippetFormProps {
@@ -12,11 +12,6 @@ const SnippetForm: React.FC<SnippetFormProps> = ({ onSubmit, onCancel }) => {
   const [command, setCommand] = useState("");
 
   const handleSubmit = () => {
-    if (!name.trim() || !command.trim()) {
-      alert("全て入力してください");
-      return;
-    }
-
     onSubmit({ name: name.trim(), command: command.trim() });
     setName("");
     setCommand("");
@@ -25,22 +20,21 @@ const SnippetForm: React.FC<SnippetFormProps> = ({ onSubmit, onCancel }) => {
   return (
     <div className="form-container">
       <h3>新規登録フォーム</h3>
-      <VSCodeTextField
+      <TextField
         value={name}
         placeholder="スニペット名"
         className="form-textfield"
         onInput={(e) => setName((e.target as HTMLInputElement).value)}
       />
-      <VSCodeTextField
+      <TextField
         value={command}
         placeholder="追加コマンド"
         className="form-textfield"
         onInput={(e) => setCommand((e.target as HTMLInputElement).value)}
       />
-      <br />
       <div className="form-actions">
-        <VSCodeButton onClick={handleSubmit}>登録</VSCodeButton>
-        <VSCodeButton onClick={onCancel}>閉じる</VSCodeButton>
+        <Button onClick={handleSubmit}>登録</Button>
+        <Button onClick={onCancel}>閉じる</Button>
       </div>
     </div>
   );
