@@ -14,6 +14,8 @@ interface MeatballMenuContextType {
   closeMenu: () => void;
 }
 
+export const DATA_MENU_AREA = "data-menu-area";
+
 const MeatballMenuContext = createContext<MeatballMenuContextType | undefined>(undefined);
 
 export const MeatballMenuProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
@@ -30,7 +32,7 @@ export const MeatballMenuProvider: React.FC<{ children: ReactNode }> = ({ childr
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as HTMLElement;
-      if (!target.closest('[data-meatball-menu="true"]')) {
+      if (!target.closest(`[${DATA_MENU_AREA}]`)) {
         closeMenu();
       }
     };

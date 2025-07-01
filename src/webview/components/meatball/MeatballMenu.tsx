@@ -2,7 +2,8 @@ import { VSCodeOption } from "@vscode/webview-ui-toolkit/react";
 import * as React from "react";
 import { useMeatballMenu } from "./MeatballMenuContext";
 import { MenuItem } from "../../types";
-import { vscodeThemeColors } from "../../types/VscodeColor";
+import { DATA_MENU_AREA } from "./MeatballMenuContext";
+import { VSCODE_THEME_COLORS } from "../../const/VscodeColor";
 
 interface MeatballMenuProps {
   id: string;
@@ -14,7 +15,7 @@ const MeatballMenu: React.FC<MeatballMenuProps> = ({ id, menuItems }) => {
   const isOpen = openMenuId === id;
 
   return (
-    <div style={{ position: "relative", display: "inline-block" }} data-meatball-menu="true">
+    <div style={{ position: "relative", display: "inline-block" }} data-menu-area={DATA_MENU_AREA}>
       <button
         onClick={() => openMenu(id)}
         style={{
@@ -23,7 +24,7 @@ const MeatballMenu: React.FC<MeatballMenuProps> = ({ id, menuItems }) => {
           fontSize: "16px",
           cursor: "pointer",
           padding: "4px 8px",
-          color: vscodeThemeColors.dropdownForeground,
+          color: VSCODE_THEME_COLORS.dropdownForeground,
         }}>
         ⋯
       </button>
@@ -33,8 +34,8 @@ const MeatballMenu: React.FC<MeatballMenuProps> = ({ id, menuItems }) => {
             position: "absolute",
             top: "100%",
             right: 0,
-            backgroundColor: vscodeThemeColors.dropdownBackground,
-            border: "1px solid " + vscodeThemeColors.dropdownBorder,
+            backgroundColor: VSCODE_THEME_COLORS.dropdownBackground,
+            border: "1px solid " + VSCODE_THEME_COLORS.dropdownBorder,
             borderRadius: "5px",
             minWidth: "120px",
             zIndex: 1000,

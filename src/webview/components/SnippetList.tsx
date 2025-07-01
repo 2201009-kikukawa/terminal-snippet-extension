@@ -1,7 +1,7 @@
 import React from "react";
-import { VSCodeButton } from "@vscode/webview-ui-toolkit/react";
-import { MeatballMenu } from "./meatball";
 import { Snippet } from "../types";
+import MeatballMenu from "./meatball/MeatballMenu";
+import Button from "./common/Button";
 
 interface SnippetListProps {
   snippets: Snippet[];
@@ -32,12 +32,12 @@ const SnippetList: React.FC<SnippetListProps> = ({
     <div style={{ display: "flex", flexDirection: "column", gap: "0.5em", marginBottom: "1em" }}>
       {snippets.map((snippet, index) => (
         <div key={index} className="snippet-item">
-          <VSCodeButton
+          <Button
             appearance="secondary"
             className="snippet-name-button"
             onClick={() => onRunSnippet(snippet.command)}>
             {snippet.name}
-          </VSCodeButton>
+          </Button>
           <MeatballMenu
             id={`snippet-${index}`} //現在はmapのindexを使用。いずれuuidで判断するように修正
             menuItems={[

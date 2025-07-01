@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
-import { VSCodeButton } from "@vscode/webview-ui-toolkit/react";
 import { useSnippets } from "./hooks";
-import { SnippetList, SnippetForm, MeatballMenuProvider } from "./components";
+import SnippetList from "./components/SnippetList";
+import SnippetForm from "./components/SnippetForm";
+import { MeatballMenuProvider } from "./components/meatball/MeatballMenuContext";
 import { Snippet } from "./types";
+import { Button } from "./components/common";
 import "./styles.css";
 
 const App: React.FC = () => {
@@ -12,7 +14,6 @@ const App: React.FC = () => {
 
   const handleAddSnippet = (snippet: Snippet) => {
     addSnippet(snippet);
-    alert("登録されました");
     setShowForm(false);
   };
   const handleDeleteSnippet = (snippet: Snippet, index: number) => {
@@ -32,9 +33,9 @@ const App: React.FC = () => {
         onEditSnippet={handleEditSnippet}
         onDeleteSnippet={handleDeleteSnippet}
       />
-      <VSCodeButton appearance="icon" onClick={() => setShowForm(true)}>
+      <Button appearance="icon" onClick={() => setShowForm(true)}>
         <span className="add-button-icon">＋</span>
-      </VSCodeButton>{" "}
+      </Button>{" "}
       {showForm && <SnippetForm onSubmit={handleAddSnippet} onCancel={() => setShowForm(false)} />}
     </MeatballMenuProvider>
   );
