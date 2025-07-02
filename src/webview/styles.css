@@ -12,6 +12,13 @@
 }
 
 /* 新規追加ボタンのアイコン */
+.snippet-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+  margin-bottom: 1em;
+}
+
 .add-button-icon {
   font-size: 1.2em;
   font-weight: bold;
@@ -26,13 +33,12 @@
   border-radius: 5px;
 }
 
-/* フォーム内のテキストフィールド */
 .form-textfield {
+  display: block; /* VSCodeTextFieldはインライン要素なのでブロック要素にする */
   width: 100%;
   margin-bottom: 0.5em;
 }
 
-/* フォームのボタンをまとめるコンテナ */
 .form-actions {
   display: flex;
   gap: 0.5em;
