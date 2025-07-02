@@ -1,115 +1,45 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import ReactDOM from "react-dom/client";
-import { VSCodeButton, VSCodeTextField, } from "@vscode/webview-ui-toolkit/react";
-import { EventTypes } from "../types/eventTypes";
+import { useSnippets } from "./hooks";
+import SnippetList from "./components/SnippetList";
+import SnippetForm from "./components/SnippetForm";
+import { MeatballMenuProvider } from "./components/meatball/MeatballMenuContext";
+import { Snippet } from "./types";
+import { Button } from "./components/common";
+import "./styles.css";
 
-declare const acquireVsCodeApi: any;
-const vscode = acquireVsCodeApi();
-
-const main = () => {
+const App: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
-  const [snippets, setSnippets] = useState<{ name: string; command: string }[]>([]);
+  const { snippets, addSnippet, deleteSnippet, runSnippet } = useSnippets();
 
-  const handleRegister = () => {
-  const snippetName = (document.querySelector("#snippetName") as HTMLInputElement).value;
-  const snippetCommand = (document.querySelector("#snippetCommand") as HTMLInputElement).value;
+  const handleAddSnippet = (snippet: Snippet) => {
+    addSnippet(snippet);
+    setShowForm(false);
+  };
+  const handleDeleteSnippet = (snippet: Snippet, index: number) => {
+    deleteSnippet(snippet, index);
+  };
 
-  if (!snippetName || !snippetCommand) {
-    alert("全て入力してください");
-    return;
-  }
-
-  // WebView→拡張機能へメッセージ送信
-  vscode.postMessage({
-    type: EventTypes.AddSnippet,
-    value: {
-      name: snippetName,
-      command: snippetCommand,
-    },
-  });
-
-  alert("登録されました");
-  setShowForm(false);
-
-  setSnippets([...snippets, { name: snippetName, command: snippetCommand }]);
-};
-
-useEffect(() => {
-    vscode.postMessage({ type: EventTypes.GetSnippets });
-
-    window.addEventListener("message", (event) => {
-      const message = event.data;
-      if (message.type === EventTypes.SnippetsData) {
-        setSnippets(message.value);
-      }
-    });
-  }, []);
+  const handleEditSnippet = (snippet: Snippet, index: number) => {
+    // 編集機能は後で実装
+    handleDeleteSnippet(snippet, index);
+  };
 
   return (
-    <>
-    {/* スニペット一覧（ボタン形式） */}
-      <div className="snippet-list">
-        {snippets.length === 0 ? (
-          <p>スニペットはまだありません</p>
-        ) : (
-          snippets.map((snippet, index) => (
-            <div key={index} className="snippet-item">
-             <VSCodeButton
-                appearance="secondary"
-                title={snippet.command}
-                onClick={() => {
-                  vscode.postMessage({
-                    type: EventTypes.RunSnippet,
-                    value: snippet.command,
-                  });
-                }}
-              >
-                {snippet.name}
-              </VSCodeButton>
-
-              <VSCodeButton
-                appearance="icon"
-                title="削除"
-                onClick={() => {
-
-                  vscode.postMessage({
-                    type: EventTypes.DeleteSnippet,
-                    value: snippet, // name + command 両方送信
-                  });
-
-                  // フロント側からも即座に消す（仮想的な同期）
-                  setSnippets(snippets.filter((_, i) => i !== index));
-                }}
-              >
-                🗑️
-              </VSCodeButton>
-            </div>
-          ))
-        )}
-      </div>
-
-      <VSCodeButton appearance="icon" onClick={() => setShowForm(true)}>
+    <MeatballMenuProvider>
+      <SnippetList
+        snippets={snippets}
+        onRunSnippet={runSnippet}
+        onEditSnippet={handleEditSnippet}
+        onDeleteSnippet={handleDeleteSnippet}
+      />
+      <Button appearance="icon" onClick={() => setShowForm(true)}>
         <span className="add-button-icon">＋</span>
-      </VSCodeButton>
-
-      {showForm && (
-        <div className="form-container">
-          <h3>新規登録フォーム</h3>
-          <VSCodeTextField id="snippetName"  placeholder="スニペット名" className="form-textfield" />
-          <VSCodeTextField id="snippetCommand"  placeholder="追加コマンド" className="form-textfield" />
-
-          <br />
-          <div className="form-actions">
-            <VSCodeButton onClick={handleRegister}>登録</VSCodeButton>
-            <VSCodeButton onClick={() => setShowForm(false)}>閉じる</VSCodeButton>
-          </div>
-        </div>
-      )}
-    </>
+      </Button>{" "}
+      {showForm && <SnippetForm onSubmit={handleAddSnippet} onCancel={() => setShowForm(false)} />}
+    </MeatballMenuProvider>
   );
 };
 
-export default main;
-
 const root = ReactDOM.createRoot(document.getElementById("root")!);
-root.render(React.createElement(main));
+root.render(<App />);
