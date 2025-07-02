@@ -29,7 +29,7 @@ const SnippetList: React.FC<SnippetListProps> = ({
   }
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "0.5em", marginBottom: "1em" }}>
+    <div className="snippet-list">
       {snippets.map((snippet, index) => (
         <div key={index} className="snippet-item">
           <Button
