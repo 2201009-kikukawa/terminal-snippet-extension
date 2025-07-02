@@ -6,6 +6,7 @@ interface ButtonProps {
   children: React.ReactNode;
   appearance?: "primary" | "secondary" | "icon";
   className?: string;
+  title?: string;
 }
 
 const Button: React.FC<ButtonProps> = ({ children, ...rest }) => {

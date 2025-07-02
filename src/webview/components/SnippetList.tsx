@@ -35,6 +35,7 @@ const SnippetList: React.FC<SnippetListProps> = ({
           <Button
             appearance="secondary"
             className="snippet-name-button"
+            title={snippet.command}
             onClick={() => onRunSnippet(snippet.command)}>
             {snippet.name}
           </Button>
