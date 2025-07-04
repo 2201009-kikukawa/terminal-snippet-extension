@@ -1,14 +1,22 @@
+.snippet-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5em;
+}
+
+/* スニペット名を表示するボタン */
+.snippet-name-button {
+  flex-grow: 1;
+  text-align: left;
+}
+
+/* 新規追加ボタンのアイコン */
 .snippet-list {
   display: flex;
   flex-direction: column;
   gap: 0.5em;
   margin-bottom: 1em;
-}
-
-.snippet-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5em;
 }
 
 .add-button-icon {
@@ -17,11 +25,12 @@
   line-height: 1;
 }
 
+/* 新規登録フォームのコンテナ */
 .form-container {
   margin-top: 1em;
-  /* VSCodeのテーマに合わせた枠線色 */
-  border: 1px solid var(--vscode-settings-sashBorder); 
+  border: 1px solid var(--vscode-input-border); /* VSCodeのテーマに合わせる */
   padding: 1em;
+  border-radius: 5px;
 }
 
 .form-textfield {

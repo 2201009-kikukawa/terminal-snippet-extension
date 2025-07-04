@@ -24,7 +24,6 @@ export class SnippetEventListener {
 
   public setWebviewMessageListener(webviewView: WebviewView) {
     webviewView.webview.onDidReceiveMessage(async (message) => {
-
       switch (message.type) {
         case EventTypes.AddSnippet:
           await this.handleAddSnippet(message.value);
@@ -53,8 +52,8 @@ export class SnippetEventListener {
 
       const currentSnippets = JSON.parse(fs.readFileSync(this.snippetsFile, "utf8"));
       const updatedSnippets = [...currentSnippets, value];
-      
-      fs.writeFileSync(this.snippetsFile, JSON.stringify(updatedSnippets, null, 2), "utf8");
+
+      fs.writeFileSync(this.snippetsFile, JSON.stringify(updatedSnippets, null, 2), "utf8"); //保存のさいにuuidを追加する必要がある
       console.log("スニペット保存成功");
     } catch (error) {
       console.error("スニペット保存失敗", error);
@@ -81,7 +80,8 @@ export class SnippetEventListener {
 
   private handleRunSnippet(command: string) {
     try {
-      const terminal = vscode.window.activeTerminal || vscode.window.createTerminal("Snippet Terminal");
+      const terminal =
+        vscode.window.activeTerminal || vscode.window.createTerminal("Snippet Terminal");
       terminal.show();
       terminal.sendText(command, true);
     } catch (error) {
@@ -99,7 +99,7 @@ export class SnippetEventListener {
       const currentSnippets = JSON.parse(content);
 
       const updatedSnippets = currentSnippets.filter(
-        (s: any) => s.name !== value.name || s.command !== value.command
+        (s: any) => s.name !== value.name || s.command !== value.command //のちのちスニペットのフィルタリングをidに変更
       );
 
       fs.writeFileSync(this.snippetsFile, JSON.stringify(updatedSnippets, null, 2), "utf8");
