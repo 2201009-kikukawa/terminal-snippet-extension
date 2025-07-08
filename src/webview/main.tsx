@@ -8,7 +8,8 @@ const vscode = acquireVsCodeApi();
 
 const main = () => {
   const [showForm, setShowForm] = useState(false);
-  const [snippets, setSnippets] = useState<{ name: string; command: string }[]>([]);
+  // ★ 1. stateの型にidを追加
+  const [snippets, setSnippets] = useState<{ id: string; name: string; command: string }[]>([]);
 
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -38,7 +39,8 @@ const main = () => {
   alert("登録されました");
   setShowForm(false);
 
-  setSnippets([...snippets, { name: snippetName, command: snippetCommand }]);
+  // ★ 2. フロントでの仮想的な追加を削除。バックエンドからのデータ更新に任せる
+    // setSnippets([...snippets, { name: snippetName, command: snippetCommand }]);
 };
 
 useEffect(() => {
@@ -146,8 +148,9 @@ useEffect(() => {
         {snippets.length === 0 ? (
           <p>スニペットはまだありません</p>
         ) : (
-          snippets.map((snippet, index) => (
-            <div key={index} className="snippet-item">
+          snippets.map((snippet) => (
+            // ★ 3. keyにindexではなく、一意なsnippet.idを使用
+            <div key={snippet.id} className="snippet-item">
              <VSCodeButton
                 appearance="secondary"
                 title={snippet.command}
@@ -168,11 +171,12 @@ useEffect(() => {
 
                   vscode.postMessage({
                     type: EventTypes.DeleteSnippet,
-                    value: snippet, // name + command 両方送信
+                    // ★ 4. 削除対象のidを送信
+                    value: snippet.id,
                   });
 
-                  // フロント側からも即座に消す（仮想的な同期）
-                  setSnippets(snippets.filter((_, i) => i !== index));
+                  // ★ 5. 楽観的UI更新もidベースに変更
+                  setSnippets(snippets.filter((s) => s.id !== snippet.id));
                 }}
               >
                 🗑️

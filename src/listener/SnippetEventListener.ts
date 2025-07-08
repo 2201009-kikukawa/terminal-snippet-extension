@@ -3,6 +3,7 @@ import * as fs from "fs";
 import * as vscode from "vscode";
 import * as path from "path";
 import { EventTypes } from "../types/eventTypes";
+import * as crypto from "crypto"; // ★ 1. cryptoモジュールをインポート
 
 export class SnippetEventListener {
   private readonly snippetsFile: string;
@@ -28,6 +29,8 @@ export class SnippetEventListener {
       switch (message.type) {
         case EventTypes.AddSnippet:
           await this.handleAddSnippet(message.value);
+          // ★ 4. 追加後、最新のリストを再送信する
+          this.handleGetSnippets(webviewView);
           break;
 
         case EventTypes.GetSnippets:
@@ -39,6 +42,7 @@ export class SnippetEventListener {
           break;
 
         case EventTypes.DeleteSnippet:
+          // ★ 5. message.value (id) を渡すように変更
           this.handleDeleteSnippet(message.value, webviewView);
           break;
       }
@@ -52,7 +56,11 @@ export class SnippetEventListener {
       }
 
       const currentSnippets = JSON.parse(fs.readFileSync(this.snippetsFile, "utf8"));
-      const updatedSnippets = [...currentSnippets, value];
+
+      // ★ 2. IDを付与した新しいスニペットオブジェクトを作成
+      const newSnippet = { id: crypto.randomUUID(), ...value,};
+
+      const updatedSnippets = [...currentSnippets, newSnippet];
       
       fs.writeFileSync(this.snippetsFile, JSON.stringify(updatedSnippets, null, 2), "utf8");
       console.log("スニペット保存成功");
@@ -89,7 +97,8 @@ export class SnippetEventListener {
     }
   }
 
-  private handleDeleteSnippet(value: { name: string; command: string }, webviewView: WebviewView) {
+  // ★ 3. 削除処理をIDベースに変更
+  private handleDeleteSnippet(snippetId: string, webviewView: WebviewView) {
     try {
       if (!fs.existsSync(this.snippetsFile)) {
         return console.error("スニペットファイルが存在しません");
@@ -99,7 +108,7 @@ export class SnippetEventListener {
       const currentSnippets = JSON.parse(content);
 
       const updatedSnippets = currentSnippets.filter(
-        (s: any) => s.name !== value.name || s.command !== value.command
+        (s: any) => s.id !== snippetId
       );
 
       fs.writeFileSync(this.snippetsFile, JSON.stringify(updatedSnippets, null, 2), "utf8");
