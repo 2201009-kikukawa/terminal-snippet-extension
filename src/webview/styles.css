@@ -1,3 +1,16 @@
+.snippet-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5em;
+}
+
+/* スニペット名を表示するボタン */
+.snippet-name-button {
+  flex-grow: 1;
+  text-align: left;
+}
+
 .snippet-list {
   display: flex;
   flex-direction: column;
@@ -5,23 +18,12 @@
   margin-bottom: 1em;
 }
 
-.snippet-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5em;
-}
-
-.add-button-icon {
-  font-size: 1.2em;
-  font-weight: bold;
-  line-height: 1;
-}
-
+/* 新規登録フォームのコンテナ */
 .form-container {
   margin-top: 1em;
-  /* VSCodeのテーマに合わせた枠線色 */
-  border: 1px solid var(--vscode-settings-sashBorder); 
+  border: 1px solid var(--vscode-input-border); /* VSCodeのテーマに合わせる */
   padding: 1em;
+  border-radius: 5px;
 }
 
 .form-textfield {
@@ -34,4 +36,39 @@
   display: flex;
   gap: 0.5em;
   justify-content: flex-end;
+}
+
+.add-button-container {
+  display: flex;
+  margin-bottom: 1em;
+}
+
+.add-button {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-right: none;
+  width: 100%;
+}
+
+.add-dropdown-button {
+  height: 100%;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left: 1px solid var(--button-secondary-background);
+}
+
+.add-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  width: auto;
+  background: var(--vscode-menu-background);
+  border: 1px solid var(--vscode-menu-border);
+  box-shadow: var(--vscode-menu-shadow);
+  padding: 4px 8px;
+  margin-top: 2px;
+  border-radius: 3px;
 }

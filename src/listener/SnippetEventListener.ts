@@ -25,7 +25,6 @@ export class SnippetEventListener {
 
   public setWebviewMessageListener(webviewView: WebviewView) {
     webviewView.webview.onDidReceiveMessage(async (message) => {
-
       switch (message.type) {
         case EventTypes.AddSnippet:
           await this.handleAddSnippet(message.value);
@@ -89,7 +88,8 @@ export class SnippetEventListener {
 
   private handleRunSnippet(command: string) {
     try {
-      const terminal = vscode.window.activeTerminal || vscode.window.createTerminal("Snippet Terminal");
+      const terminal =
+        vscode.window.activeTerminal || vscode.window.createTerminal("Snippet Terminal");
       terminal.show();
       terminal.sendText(command, true);
     } catch (error) {
