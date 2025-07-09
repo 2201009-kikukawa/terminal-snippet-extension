@@ -1,4 +1,5 @@
 export interface Snippet {
+  id: string;
   name: string;
   command: string;
 }

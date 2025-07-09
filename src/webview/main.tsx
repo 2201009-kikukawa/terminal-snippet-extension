@@ -41,13 +41,14 @@ const App: React.FC = () => {
     addSnippet(snippet);
     setShowForm(false);
   };
-  const handleDeleteSnippet = (snippet: Snippet, index: number) => {
-    deleteSnippet(snippet, index);
+
+  const handleDeleteSnippet = (id: string) => {
+    deleteSnippet(id);
   };
 
   const handleEditSnippet = (snippet: Snippet, index: number) => {
     // 編集機能は後で実装
-    handleDeleteSnippet(snippet, index);
+    // handleDeleteSnippet(snippet);
   };
 
   return (
