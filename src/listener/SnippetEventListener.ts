@@ -3,7 +3,6 @@ import * as fs from "fs";
 import * as vscode from "vscode";
 import * as path from "path";
 import { EventTypes } from "../types/eventTypes";
-import * as crypto from "crypto";
 import { Snippet } from "../webview/types";
 
 export class SnippetEventListener {
@@ -47,15 +46,14 @@ export class SnippetEventListener {
     });
   }
 
-  private async handleAddSnippet(value: { name: string; command: string }) {
+  private async handleAddSnippet(value: Snippet) {
     try {
       if (!fs.existsSync(this.snippetsFile)) {
         return console.error("スニペットファイルが存在しません");
       }
 
       const currentSnippets = JSON.parse(fs.readFileSync(this.snippetsFile, "utf8"));
-      const newSnippet = { id: crypto.randomUUID(), ...value };
-      const updatedSnippets = [...currentSnippets, newSnippet];
+      const updatedSnippets = [...currentSnippets, value];
 
       fs.writeFileSync(this.snippetsFile, JSON.stringify(updatedSnippets, null, 2), "utf8");
       console.log("スニペット保存成功");
