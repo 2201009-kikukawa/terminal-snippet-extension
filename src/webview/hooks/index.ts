@@ -30,12 +30,12 @@ export const useSnippets = () => {
     setSnippets((prev) => [...prev, snippet]);
   };
 
-  const deleteSnippet = (snippet: Snippet, index: number) => {
+  const deleteSnippet = (id: string) => {
     vscode.postMessage({
       type: EventTypes.DeleteSnippet,
-      value: snippet,
+      value: id,
     });
-    setSnippets((prev) => prev.filter((_, i) => i !== index));
+    setSnippets((prev) => prev.filter((snippet) => snippet.id !== id));
   };
 
   const runSnippet = (command: string) => {
@@ -46,5 +46,3 @@ export const useSnippets = () => {
   };
   return { snippets, addSnippet, deleteSnippet, runSnippet };
 };
-
-

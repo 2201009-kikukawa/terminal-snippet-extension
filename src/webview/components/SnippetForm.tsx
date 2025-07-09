@@ -12,7 +12,7 @@ const SnippetForm: React.FC<SnippetFormProps> = ({ onSubmit, onCancel }) => {
   const [command, setCommand] = useState("");
 
   const handleSubmit = () => {
-    onSubmit({ name: name.trim(), command: command.trim() });
+    onSubmit({ id: crypto.randomUUID(), name: name.trim(), command: command.trim() });
     setName("");
     setCommand("");
   };
@@ -34,7 +34,9 @@ const SnippetForm: React.FC<SnippetFormProps> = ({ onSubmit, onCancel }) => {
       />
       <div className="form-actions">
         <Button onClick={handleSubmit}>登録</Button>
-        <Button onClick={onCancel}>閉じる</Button>
+        <Button onClick={onCancel} appearance="secondary">
+          閉じる
+        </Button>
       </div>
     </div>
   );

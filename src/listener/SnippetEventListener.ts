@@ -3,6 +3,7 @@ import * as fs from "fs";
 import * as vscode from "vscode";
 import * as path from "path";
 import { EventTypes } from "../types/eventTypes";
+import { Snippet } from "../webview/types";
 
 export class SnippetEventListener {
   private readonly snippetsFile: string;
@@ -44,7 +45,7 @@ export class SnippetEventListener {
     });
   }
 
-  private async handleAddSnippet(value: { name: string; command: string }) {
+  private async handleAddSnippet(value: Snippet) {
     try {
       if (!fs.existsSync(this.snippetsFile)) {
         return console.error("スニペットファイルが存在しません");
@@ -53,7 +54,7 @@ export class SnippetEventListener {
       const currentSnippets = JSON.parse(fs.readFileSync(this.snippetsFile, "utf8"));
       const updatedSnippets = [...currentSnippets, value];
 
-      fs.writeFileSync(this.snippetsFile, JSON.stringify(updatedSnippets, null, 2), "utf8"); //保存のさいにuuidを追加する必要がある
+      fs.writeFileSync(this.snippetsFile, JSON.stringify(updatedSnippets, null, 2), "utf8");
       console.log("スニペット保存成功");
     } catch (error) {
       console.error("スニペット保存失敗", error);
@@ -89,7 +90,7 @@ export class SnippetEventListener {
     }
   }
 
-  private handleDeleteSnippet(value: { name: string; command: string }, webviewView: WebviewView) {
+  private handleDeleteSnippet(snippetId: string, webviewView: WebviewView) {
     try {
       if (!fs.existsSync(this.snippetsFile)) {
         return console.error("スニペットファイルが存在しません");
@@ -97,10 +98,7 @@ export class SnippetEventListener {
 
       const content = fs.readFileSync(this.snippetsFile, "utf8");
       const currentSnippets = JSON.parse(content);
-
-      const updatedSnippets = currentSnippets.filter(
-        (s: any) => s.name !== value.name || s.command !== value.command //のちのちスニペットのフィルタリングをidに変更
-      );
+      const updatedSnippets = currentSnippets.filter((s: Snippet) => s.id !== snippetId);
 
       fs.writeFileSync(this.snippetsFile, JSON.stringify(updatedSnippets, null, 2), "utf8");
       console.log("スニペット削除成功");

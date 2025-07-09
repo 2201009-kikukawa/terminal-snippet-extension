@@ -7,7 +7,7 @@ interface SnippetListProps {
   snippets: Snippet[];
   onRunSnippet: (command: string) => void;
   onEditSnippet: (snippet: Snippet, index: number) => void;
-  onDeleteSnippet: (snippet: Snippet, index: number) => void;
+  onDeleteSnippet: (id: string) => void;
 }
 
 const SnippetList: React.FC<SnippetListProps> = ({
@@ -16,8 +16,8 @@ const SnippetList: React.FC<SnippetListProps> = ({
   onEditSnippet,
   onDeleteSnippet,
 }) => {
-  const handleDelete = (snippet: Snippet, index: number) => {
-    onDeleteSnippet(snippet, index);
+  const handleDelete = (id: string) => {
+    onDeleteSnippet(id);
   };
 
   const handleEdit = (snippet: Snippet, index: number) => {
@@ -31,7 +31,7 @@ const SnippetList: React.FC<SnippetListProps> = ({
   return (
     <div className="snippet-list">
       {snippets.map((snippet, index) => (
-        <div key={index} className="snippet-item">
+        <div key={snippet.id} className="snippet-item">
           <Button
             appearance="secondary"
             className="snippet-name-button"
@@ -40,11 +40,11 @@ const SnippetList: React.FC<SnippetListProps> = ({
             {snippet.name}
           </Button>
           <MeatballMenu
-            id={`snippet-${index}`} //現在はmapのindexを使用。いずれuuidで判断するように修正
+            id={`meatball-menu-${snippet.id}`}
             menuItems={[
               {
                 label: "削除",
-                onClick: () => handleDelete(snippet, index),
+                onClick: () => handleDelete(snippet.id),
               },
               {
                 label: "編集",
