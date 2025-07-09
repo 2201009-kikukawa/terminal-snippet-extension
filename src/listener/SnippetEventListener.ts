@@ -28,7 +28,6 @@ export class SnippetEventListener {
       switch (message.type) {
         case EventTypes.AddSnippet:
           await this.handleAddSnippet(message.value);
-          // this.handleGetSnippets(webviewView);
           break;
 
         case EventTypes.GetSnippets:
