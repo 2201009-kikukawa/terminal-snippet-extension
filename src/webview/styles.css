@@ -40,21 +40,33 @@
 
 .add-button-container {
   display: flex;
-  margin-bottom: 1em;
+  align-items: stretch; /* ★ これに変更 */
 }
 
 .add-button {
+  /* ★ これが主要な変更点。残りの利用可能なスペースをすべて埋める */
+  flex-grow: 1;
+  width: auto; /* width: 100% は削除 */
+
+  /* 角丸と右の境界線をなくす設定は正しいので維持 */
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
   border-right: none;
-  width: 100%;
+
+  /* テキストが左揃えになるように */
+  text-align: left;
 }
 
 .add-dropdown-button {
-  height: 100%;
+  /* height: 100% は不要なので削除 */
+  height: auto;
+  
+  /* 角丸の設定は正しいので維持 */
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
-  border-left: 1px solid var(--button-secondary-background);
+
+  /* ★ 区切り線の色を、よりボタンの境界線らしい色に調整 */
+  border-left: 1px solid var(--vscode-button-border, var(--vscode-input-border));
 }
 
 .add-dropdown-menu {

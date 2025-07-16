@@ -3,17 +3,19 @@ import ReactDOM from "react-dom/client";
 import { useSnippets } from "./hooks";
 import SnippetList from "./components/SnippetList";
 import SnippetForm from "./components/SnippetForm";
+import GroupForm from "./components/GroupForm"; // ★ 追加
 import { MeatballMenuProvider } from "./components/meatball/MeatballMenuContext";
-import { Snippet } from "./types";
+import { Snippet, Group } from "./types"; // ★ Group を追加
 import { Button, Option } from "./components/common";
 import "./styles.css";
 import ChevronDownIcon from "../icons/ChevronDownIcon";
 
 const App: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
+  const [showGroupForm, setShowGroupForm] = useState(false); // ★ 追加
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { snippets, addSnippet, deleteSnippet, runSnippet } = useSnippets();
+  const { snippets, addSnippet, deleteSnippet, runSnippet, addGroup } = useSnippets(); // ★ addGroup を追加
 
   const handleDropdownToggle = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -42,6 +44,12 @@ const App: React.FC = () => {
     setShowForm(false);
   };
 
+  // ★ 以下を追加
+  const handleAddGroup = (group: Omit<Group, 'snippets'> & { snippets: [] }) => {
+    addGroup(group);
+    setShowGroupForm(false);
+  };
+
   const handleDeleteSnippet = (id: string) => {
     deleteSnippet(id);
   };
@@ -53,23 +61,29 @@ const App: React.FC = () => {
 
   return (
     <MeatballMenuProvider>
-      <div style={{ position: "relative" }}>
+      {/* 1. ボタンとメニューを囲む親divを作成し、refをここに設定 */}
+      <div style={{ position: "relative" }} ref={dropdownRef}>
         <div className="add-button-container">
           <Button className="add-button" onClick={() => setShowForm(true)}>
             スニペットを追加する
           </Button>
-          <div ref={dropdownRef}>
-            <Button className="add-dropdown-button" onClick={handleDropdownToggle}>
-              <ChevronDownIcon />
-            </Button>
-          </div>
+          {/* 2. ref={dropdownRef} は親に移動したので、ここのdivは不要 */}
+          <Button className="add-dropdown-button" onClick={handleDropdownToggle}>
+            <ChevronDownIcon />
+          </Button>
         </div>
 
         {isMenuOpen && (
           <div className="add-dropdown-menu">
-            {/* MEMO : オプションは一旦ダミーで実装 */}
-            <Option onClick={() => {}}>オプション 1</Option>
-            <Option onClick={() => {}}>別のオプション</Option>
+            {/* テスト用にdivに戻しておきます。動作確認後にOptionコンポーネントに再度修正してください */}
+            <Option
+              onClick={() => {
+                setShowGroupForm(true);
+                setIsMenuOpen(false);
+              }}
+            >
+              グループを追加
+            </Option>
           </div>
         )}
       </div>
@@ -80,6 +94,8 @@ const App: React.FC = () => {
         onDeleteSnippet={handleDeleteSnippet}
       />
       {showForm && <SnippetForm onSubmit={handleAddSnippet} onCancel={() => setShowForm(false)} />}
+      {/* ★ 以下を追加 */}
+      {showGroupForm && <GroupForm onSubmit={handleAddGroup} onCancel={() => setShowGroupForm(false)} />}
     </MeatballMenuProvider>
   );
 };

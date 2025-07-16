@@ -4,6 +4,11 @@ export interface Snippet {
   command: string;
 }
 
+export interface Group {
+  groupName: string;
+  snippets: Snippet[];
+}
+
 export interface MenuItem {
   label: string;
   onClick: () => void;
