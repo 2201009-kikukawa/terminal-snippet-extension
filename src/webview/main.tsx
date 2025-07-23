@@ -15,7 +15,8 @@ const App: React.FC = () => {
   const [showGroupForm, setShowGroupForm] = useState(false); // ★ 追加
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { snippets, addSnippet, deleteSnippet, runSnippet, addGroup } = useSnippets(); // ★ addGroup を追加
+  // ★ useSnippets から groups も取得
+  const { snippets, groups, addSnippet, deleteSnippet, runSnippet, addGroup } = useSnippets();
 
   const handleDropdownToggle = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -39,13 +40,14 @@ const App: React.FC = () => {
     };
   }, [isMenuOpen]);
 
-  const handleAddSnippet = (snippet: Snippet) => {
-    addSnippet(snippet);
+  // ★ handleAddSnippet を groupId を受け取れるように変更
+  const handleAddSnippet = (snippet: Snippet, groupId?: string) => {
+    addSnippet(snippet, groupId);
     setShowForm(false);
   };
 
-  // ★ 以下を追加
-  const handleAddGroup = (group: Omit<Group, 'snippets'> & { snippets: [] }) => {
+  // ★ handleAddGroup の型を更新
+  const handleAddGroup = (group: Group) => {
     addGroup(group);
     setShowGroupForm(false);
   };
@@ -54,9 +56,10 @@ const App: React.FC = () => {
     deleteSnippet(id);
   };
 
-  const handleEditSnippet = (snippet: Snippet, index: number) => {
+  // ▼ handleEditSnippet の引数を (snippet, index) から (snippet) に変更
+  const handleEditSnippet = (snippet: Snippet) => {
     // 編集機能は後で実装
-    // handleDeleteSnippet(snippet);
+    console.log("Editing snippet:", snippet);
   };
 
   return (
@@ -87,14 +90,22 @@ const App: React.FC = () => {
           </div>
         )}
       </div>
+      {/* ▼ SnippetList に groups と snippets の両方を渡す */}
       <SnippetList
+        groups={groups}
         snippets={snippets}
         onRunSnippet={runSnippet}
         onEditSnippet={handleEditSnippet}
         onDeleteSnippet={handleDeleteSnippet}
       />
-      {showForm && <SnippetForm onSubmit={handleAddSnippet} onCancel={() => setShowForm(false)} />}
-      {/* ★ 以下を追加 */}
+      {/* ★ SnippetForm に groups を渡す */}
+      {showForm && (
+        <SnippetForm
+          onSubmit={handleAddSnippet}
+          onCancel={() => setShowForm(false)}
+          groups={groups}
+        />
+      )}
       {showGroupForm && <GroupForm onSubmit={handleAddGroup} onCancel={() => setShowGroupForm(false)} />}
     </MeatballMenuProvider>
   );

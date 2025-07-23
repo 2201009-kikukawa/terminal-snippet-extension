@@ -1,18 +1,18 @@
 import { useState, useEffect } from "react";
 import { EventTypes } from "../../types/eventTypes";
-import { Snippet, Group } from "../types"; // ★ Group をインポート
+import { Snippet, Group } from "../types";
 
 declare const acquireVsCodeApi: any;
 const vscode = acquireVsCodeApi();
 
 export const useSnippets = () => {
   const [snippets, setSnippets] = useState<Snippet[]>([]);
-  const [groups, setGroups] = useState<Group[]>([]); // ★ グループ用の state を追加
+  const [groups, setGroups] = useState<Group[]>([]);
 
   useEffect(() => {
     // 起動時にスニペットとグループの両方を取得する
     vscode.postMessage({ type: EventTypes.GetSnippets });
-    vscode.postMessage({ type: EventTypes.GetGroups }); // ★ グループ取得メッセージを送信
+    vscode.postMessage({ type: EventTypes.GetGroups });
 
     const handleMessage = (event: MessageEvent) => {
       const message = event.data;
@@ -31,16 +31,18 @@ export const useSnippets = () => {
     return () => window.removeEventListener("message", handleMessage);
   }, []);
 
-  const addSnippet = (snippet: Snippet) => {
+  // ★ addSnippet が groupId を受け取れるように変更
+  const addSnippet = (snippet: Snippet, groupId?: string) => {
     vscode.postMessage({
       type: EventTypes.AddSnippet,
-      value: snippet,
+      // ★ snippet と groupId を value オブジェクトで渡す
+      value: { snippet, groupId },
     });
-    setSnippets((prev) => [...prev, snippet]);
+    // ★ 楽観的更新を削除。バックエンドからの SnippetsData or GroupsData イベントでUIが更新される
   };
 
-  // ★ グループ追加関数を追加
-  const addGroup = (group: Omit<Group, 'snippets'> & { snippets: [] }) => {
+  // ★ addGroup の型を新しい Group 型に合わせる
+  const addGroup = (group: Group) => {
     vscode.postMessage({
       type: EventTypes.AddGroup,
       value: group,
@@ -52,7 +54,7 @@ export const useSnippets = () => {
       type: EventTypes.DeleteSnippet,
       value: id,
     });
-    setSnippets((prev) => prev.filter((snippet) => snippet.id !== id));
+    // ★ こちらも楽観的更新を削除し、バックエンドからのレスポンスに任せる
   };
 
   const runSnippet = (command: string) => {
@@ -62,6 +64,5 @@ export const useSnippets = () => {
     });
   };
   
-  // ★ groups と addGroup を return に追加
   return { snippets, groups, addSnippet, addGroup, deleteSnippet, runSnippet };
 };

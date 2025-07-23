@@ -4,7 +4,9 @@ export interface Snippet {
   command: string;
 }
 
+// ★ Group インターフェースに id を追加
 export interface Group {
+  id: string; // ★ 追加
   groupName: string;
   snippets: Snippet[];
 }

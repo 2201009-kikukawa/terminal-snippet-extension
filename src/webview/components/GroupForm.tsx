@@ -1,19 +1,26 @@
 import React, { useState } from "react";
 import { TextField, Button } from "./common";
-import { Group } from "../types";
+import { Group } from "../types"; // ★ typesからGroupをインポート
 
+// ★ onSubmitの型を、idを含む完全なGroupオブジェクトを受け取るように変更
 interface GroupFormProps {
-  onSubmit: (group: Omit<Group, 'snippets'> & { snippets: [] }) => void;
+  onSubmit: (group: Group) => void;
   onCancel: () => void;
 }
 
 const GroupForm: React.FC<GroupFormProps> = ({ onSubmit, onCancel }) => {
-  console.log("GroupFormがレンダリングされました"); // ← この行を追加
   const [groupName, setGroupName] = useState("");
 
   const handleSubmit = () => {
-    if (!groupName.trim()) return; // グループ名が空の場合は何もしない
-    onSubmit({ groupName: groupName.trim(), snippets: [] });
+    if (!groupName.trim()) return; 
+
+    // ★ idを生成し、Groupオブジェクトを作成してonSubmitで渡す
+    onSubmit({
+      id: crypto.randomUUID(),
+      groupName: groupName.trim(),
+      snippets: [],
+    });
+
     setGroupName("");
   };
 
