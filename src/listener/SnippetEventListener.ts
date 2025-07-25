@@ -175,25 +175,60 @@ export class SnippetEventListener {
 
   private handleDeleteSnippet(snippetId: string, webviewView: WebviewView) {
     try {
-      if (!fs.existsSync(this.snippetsFile)) {
-        return console.error("スニペットファイルが存在しません");
-      }
-
-      const content = fs.readFileSync(this.snippetsFile, "utf8");
-      const currentSnippets = JSON.parse(content);
+      // 1. グループ化されていないスニペットから探す
+      const currentSnippets = this.readJsonFile<Snippet[]>(this.snippetsFile, []);
       const updatedSnippets = currentSnippets.filter((s: Snippet) => s.id !== snippetId);
-
-      fs.writeFileSync(this.snippetsFile, JSON.stringify(updatedSnippets, null, 2), "utf8");
-      console.log("スニペット削除成功");
-
-      webviewView.webview.postMessage({
-        type: EventTypes.SnippetsData,
-        value: updatedSnippets,
+  
+      // 配列の長さが変わっていれば、削除成功
+      if (updatedSnippets.length < currentSnippets.length) {
+        this.writeJsonFile(this.snippetsFile, updatedSnippets);
+        console.log("グループ化されていないスニペットを削除しました");
+        // 更新後のデータをWebviewに送信
+        webviewView.webview.postMessage({
+          type: EventTypes.SnippetsData,
+          value: updatedSnippets,
+        });
+        return; // 処理完了
+      }
+  
+      // 2. グループ化されていないスニペットになければ、グループの中から探す
+      const currentGroups = this.readJsonFile<Group[]>(this.groupsFile, []);
+      let wasDeleted = false;
+  
+      const updatedGroups = currentGroups.map((group) => {
+        const initialLength = group.snippets.length;
+        // グループ内のスニペットをフィルタリング
+        const filteredSnippets = group.snippets.filter((s) => s.id !== snippetId);
+  
+        // 削除されたかチェック
+        if (filteredSnippets.length < initialLength) {
+          wasDeleted = true;
+        }
+        
+        return { ...group, snippets: filteredSnippets };
       });
+  
+      // いずれかのグループで削除が行われた場合
+      if (wasDeleted) {
+        this.writeJsonFile(this.groupsFile, updatedGroups);
+        console.log("グループ内のスニペットを削除しました");
+        // 更新後のグループデータをWebviewに送信
+        webviewView.webview.postMessage({
+          type: EventTypes.GroupsData,
+          value: updatedGroups,
+        });
+        return; // 処理完了
+      }
+  
+      // どこにも見つからなかった場合
+      console.warn(`削除対象のスニペットが見つかりませんでした: ID=${snippetId}`);
+  
     } catch (error) {
-      console.error("スニペット削除失敗", error);
+      console.error("スニペットの削除中にエラーが発生しました", error);
     }
   }
+  // ▲▲▲【ここまで修正】▲▲▲
+  
 
   // ★ ユーティリティ関数を追加して重複を削減
   private readJsonFile<T>(filePath: string, defaultValue: T): T {
