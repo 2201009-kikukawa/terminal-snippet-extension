@@ -38,7 +38,8 @@ export class SnippetEventListener {
     webviewView.webview.onDidReceiveMessage(async (message) => {
       switch (message.type) {
         case EventTypes.AddSnippet:
-          await this.handleAddSnippet(message.value);
+          // ★ webviewView を渡すように変更
+          await this.handleAddSnippet(message.value, webviewView);
           break;
 
         // ★ 以下を追加
@@ -67,36 +68,61 @@ export class SnippetEventListener {
     });
   }
 
-  // ★ webviewView を引数に追加
+  // ★ 型を Group に変更
   private async handleAddGroup(group: Group, webviewView: WebviewView) {
     try {
-      const currentGroups = JSON.parse(fs.readFileSync(this.groupsFile, "utf8"));
+      const currentGroups = this.readJsonFile<Group[]>(this.groupsFile, []);
       const updatedGroups = [...currentGroups, group];
-
-      fs.writeFileSync(this.groupsFile, JSON.stringify(updatedGroups, null, 2), "utf8");
+      this.writeJsonFile(this.groupsFile, updatedGroups);
       console.log("グループ保存成功");
-      
-      // ★ 保存成功後、最新のグループリストをWebviewに送信
       this.handleGetGroups(webviewView);
-
     } catch (error) {
       console.error("グループ保存失敗", error);
     }
   }
 
-  private async handleAddSnippet(value: Snippet) {
-    try {
-      if (!fs.existsSync(this.snippetsFile)) {
-        return console.error("スニペットファイルが存在しません");
+  // ★ handleAddSnippet を全面的に書き換え
+  private async handleAddSnippet(
+    data: { snippet: Snippet; groupId?: string },
+    webviewView: WebviewView
+  ) {
+    const { snippet, groupId } = data;
+
+    if (groupId) {
+      // グループIDがある場合: groups.json を更新
+      try {
+        const currentGroups = this.readJsonFile<Group[]>(this.groupsFile, []);
+        const groupIndex = currentGroups.findIndex((g) => g.id === groupId);
+
+        if (groupIndex === -1) {
+          console.error(`グループが見つかりません: ${groupId}`);
+          return;
+        }
+
+        currentGroups[groupIndex].snippets.push(snippet);
+        this.writeJsonFile(this.groupsFile, currentGroups);
+        console.log("グループ内にスニペットを保存成功");
+        
+        // 更新されたグループデータをWebviewに送信
+        this.handleGetGroups(webviewView);
+
+      } catch (error) {
+        console.error("グループへのスニペット保存失敗", error);
       }
+    } else {
+      // グループIDがない場合: snippets.json を更新
+      try {
+        const currentSnippets = this.readJsonFile<Snippet[]>(this.snippetsFile, []);
+        const updatedSnippets = [...currentSnippets, snippet];
+        this.writeJsonFile(this.snippetsFile, updatedSnippets);
+        console.log("スニペット保存成功");
 
-      const currentSnippets = JSON.parse(fs.readFileSync(this.snippetsFile, "utf8"));
-      const updatedSnippets = [...currentSnippets, value];
+        // 更新されたスニペットデータをWebviewに送信
+        this.handleGetSnippets(webviewView);
 
-      fs.writeFileSync(this.snippetsFile, JSON.stringify(updatedSnippets, null, 2), "utf8");
-      console.log("スニペット保存成功");
-    } catch (error) {
-      console.error("スニペット保存失敗", error);
+      } catch (error) {
+        console.error("スニペット保存失敗", error);
+      }
     }
   }
 
@@ -167,5 +193,18 @@ export class SnippetEventListener {
     } catch (error) {
       console.error("スニペット削除失敗", error);
     }
+  }
+
+  // ★ ユーティリティ関数を追加して重複を削減
+  private readJsonFile<T>(filePath: string, defaultValue: T): T {
+    if (!fs.existsSync(filePath)) {
+      return defaultValue;
+    }
+    const content = fs.readFileSync(filePath, "utf8");
+    return JSON.parse(content) as T;
+  }
+
+  private writeJsonFile(filePath: string, data: any): void {
+    fs.writeFileSync(filePath, JSON.stringify(data, null, 2), "utf8");
   }
 }

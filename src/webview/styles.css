@@ -84,3 +84,27 @@
   margin-top: 2px;
   border-radius: 3px;
 }
+
+.form-select {
+  display: block;
+  width: 100%;
+  margin-bottom: 0.5em;
+
+  /* VSCodeテーマに馴染ませるための基本設定 */
+  background-color: var(--vscode-input-background);
+  color: var(--vscode-input-foreground);
+  border: 1px solid var(--vscode-input-border);
+  border-radius: 2px;
+  padding: 0.4em;
+
+  font-size: 1em;
+  font-family: inherit;
+
+  /* focus 時のハイライトも VSCode 風に */
+  outline: none;
+}
+
+.form-select:focus {
+  border-color: var(--vscode-focusBorder);
+  box-shadow: 0 0 0 1px var(--vscode-focusBorder);
+}
