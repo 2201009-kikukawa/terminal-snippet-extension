@@ -58,7 +58,7 @@ export class SnippetEventListener {
           break;
 
         case EventTypes.RunSnippet:
-          this.handleRunSnippet(message.value);
+          this.handleRunSnippet(message.value); // ★ 変更
           break;
 
         case EventTypes.DeleteSnippet:
@@ -162,12 +162,18 @@ export class SnippetEventListener {
     }
   }
 
-  private handleRunSnippet(command: string) {
+  private handleRunSnippet(commands: string[]) {
+    if (!commands || commands.length === 0) {
+      console.log("実行するコマンドがありません。");
+      return;
+    }
     try {
       const terminal =
         vscode.window.activeTerminal || vscode.window.createTerminal("Snippet Terminal");
       terminal.show();
-      terminal.sendText(command, true);
+      // ★ 複数のコマンドを ' && ' で連結して一度に送信
+      const fullCommand = commands.join(" && ");
+      terminal.sendText(fullCommand, true);
     } catch (error) {
       console.error("ターミナルへの送信失敗", error);
     }

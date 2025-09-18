@@ -108,3 +108,30 @@
   border-color: var(--vscode-focusBorder);
   box-shadow: 0 0 0 1px var(--vscode-focusBorder);
 }
+
+.command-input-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1px;
+  margin-top: 1px;
+  width: 100%;
+}
+
+.command-input-container .form-textfield {
+  flex-grow: 1;
+}
+
+.remove-command-button {
+  margin-left: 5px;
+  margin-bottom: 3px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* 2. ボタンを赤い枠線で囲む */
+  border: 1px solid var(--vscode-errorForeground);
+  /* 3. ボタンを円形にする */
+  border-radius: 50%;
+}
