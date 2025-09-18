@@ -57,7 +57,8 @@ export const useSnippets = () => {
     // ★ こちらも楽観的更新を削除し、バックエンドからのレスポンスに任せる
   };
 
-  const runSnippet = (command: string) => {
+  // ★ 引数を string から string[] に変更
+  const runSnippet = (command: string[]) => {
     vscode.postMessage({
       type: EventTypes.RunSnippet,
       value: command,

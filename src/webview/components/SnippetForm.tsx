@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+// ▼▼▼【ここを修正】 VSCodeLink をインポート ▼▼▼
+import { VSCodeLink } from "@vscode/webview-ui-toolkit/react";
 import { TextField, Button } from "./common";
 import { Snippet, Group } from "../types"; // ★ Group をインポート
 
@@ -11,19 +13,46 @@ interface SnippetFormProps {
 
 const SnippetForm: React.FC<SnippetFormProps> = ({ onSubmit, onCancel, groups }) => {
   const [name, setName] = useState("");
-  const [command, setCommand] = useState("");
+  // ★ command を文字列の配列で管理
+  const [commands, setCommands] = useState<string[]>([""]);
   const [selectedGroupId, setSelectedGroupId] = useState<string>(""); // ★ 選択されたグループIDを管理
 
   const handleSubmit = () => {
     const newSnippet: Snippet = {
       id: crypto.randomUUID(),
       name: name.trim(),
-      command: command.trim(),
+      command: commands.map((cmd) => cmd.trim()).filter((cmd) => cmd !== ""),
     };
-    // ★ selectedGroupId が空文字列でなければそれを、そうでなければ undefined を渡す
-    onSubmit(newSnippet, selectedGroupId || undefined);
-    setName("");
-    setCommand("");
+    
+    // スニペット名とコマンドが1つ以上入力されている場合のみ送信
+    if (newSnippet.name && newSnippet.command.length > 0) {
+      onSubmit(newSnippet, selectedGroupId || undefined);
+      // フォームの状態をリセット
+      setName("");
+      setCommands([""]);
+      setSelectedGroupId("");
+    }
+  };
+
+  // ★ コマンド入力欄を追加する関数
+  const handleAddAnotherCommand = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setCommands([...commands, ""]);
+  };
+
+  // ★ 特定のインデックスのコマンド内容を変更する関数
+  const handleCommandChange = (index: number, value: string) => {
+    const newCommands = [...commands];
+    newCommands[index] = value;
+    setCommands(newCommands);
+  };
+
+  // ★ 特定のインデックスのコマンド入力欄を削除する関数
+  const handleRemoveCommand = (index: number) => {
+    if (commands.length > 1) {
+      const newCommands = commands.filter((_, i) => i !== index);
+      setCommands(newCommands);
+    }
   };
 
   return (
@@ -35,13 +64,32 @@ const SnippetForm: React.FC<SnippetFormProps> = ({ onSubmit, onCancel, groups })
         className="form-textfield"
         onInput={(e) => setName((e.target as HTMLInputElement).value)}
       />
-      <TextField
-        value={command}
-        placeholder="追加コマンド"
-        className="form-textfield"
-        onInput={(e) => setCommand((e.target as HTMLInputElement).value)}
-      />
-      {/* ★ ここからグループ選択のセレクトボックスを追加 */}
+      {/* ★ commands配列を元にコマンド入力欄を動的に生成 */}
+      {commands.map((command, index) => (
+        <div key={index} className="command-input-container">
+          <TextField
+            value={command}
+            placeholder={`実行コマンド ${index + 1}`}
+            className="form-textfield"
+            onInput={(e) => handleCommandChange(index, (e.target as HTMLInputElement).value)}
+          />
+          {/* 入力欄が2つ以上ある場合に削除ボタンを表示 */}
+          {commands.length > 1 && (
+            <Button onClick={() => handleRemoveCommand(index)} appearance="icon" className="remove-command-button">
+              ー
+            </Button>
+          )}
+        </div>
+      ))}
+
+      {/* ▼▼▼【ここを修正】 Button を VSCodeLink に変更 ▼▼▼ */}
+      <div className="add-command-link-container">
+        <VSCodeLink href="#" onClick={handleAddAnotherCommand}>
+          続けて実行するコマンドを追加
+        </VSCodeLink>
+      </div>
+      {/* ▲▲▲【ここまで修正】▲▲▲ */}
+
       <select
         value={selectedGroupId}
         onChange={(e) => setSelectedGroupId(e.target.value)}
@@ -54,7 +102,6 @@ const SnippetForm: React.FC<SnippetFormProps> = ({ onSubmit, onCancel, groups })
           </option>
         ))}
       </select>
-      {/* ★ ここまで追加 */}
       <div className="form-actions">
         <Button onClick={handleSubmit}>登録</Button>
         <Button onClick={onCancel} appearance="secondary">

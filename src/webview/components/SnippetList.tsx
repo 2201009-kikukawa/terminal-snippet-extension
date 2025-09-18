@@ -19,7 +19,7 @@ const AccordionIcon = ({ isOpen }: { isOpen: boolean }) => (
 // ▼ 繰り返し利用するため、単一のスニペット表示を別コンポーネントに切り出します
 interface SnippetItemProps {
   snippet: Snippet;
-  onRunSnippet: (command: string) => void;
+  onRunSnippet: (command: string[]) => void;
   onEditSnippet: (snippet: Snippet) => void;
   onDeleteSnippet: (id: string) => void;
 }
@@ -34,7 +34,8 @@ const SnippetItem: React.FC<SnippetItemProps> = ({
     <Button
       appearance="secondary"
       className="snippet-name-button"
-      title={snippet.command}
+      // ★ 複数のコマンドを `&&` で連結してツールチップに表示
+      title={snippet.command.join(" && ")}
       onClick={() => onRunSnippet(snippet.command)}>
       {snippet.name}
     </Button>
@@ -53,7 +54,7 @@ const SnippetItem: React.FC<SnippetItemProps> = ({
 interface SnippetListProps {
   groups: Group[]; // グループの配列
   snippets: Snippet[]; // グループ化されていないスニペットの配列
-  onRunSnippet: (command: string) => void;
+  onRunSnippet: (command: string[]) => void; // ★ string[] に変更
   onEditSnippet: (snippet: Snippet) => void; // indexを使わない形に変更
   onDeleteSnippet: (id: string) => void;
 }
