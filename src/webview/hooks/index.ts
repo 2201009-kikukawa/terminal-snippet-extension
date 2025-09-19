@@ -17,10 +17,11 @@ export const useSnippets = () => {
     const handleMessage = (event: MessageEvent) => {
       const message = event.data;
       switch (message.type) {
+
         case EventTypes.SnippetsData:
           setSnippets(message.value);
           break;
-        // ★ グループデータ受信時の処理を追加
+
         case EventTypes.GroupsData:
           setGroups(message.value);
           break;
@@ -31,17 +32,13 @@ export const useSnippets = () => {
     return () => window.removeEventListener("message", handleMessage);
   }, []);
 
-  // ★ addSnippet が groupId を受け取れるように変更
   const addSnippet = (snippet: Snippet, groupId?: string) => {
     vscode.postMessage({
       type: EventTypes.AddSnippet,
-      // ★ snippet と groupId を value オブジェクトで渡す
       value: { snippet, groupId },
     });
-    // ★ 楽観的更新を削除。バックエンドからの SnippetsData or GroupsData イベントでUIが更新される
   };
 
-  // ★ addGroup の型を新しい Group 型に合わせる
   const addGroup = (group: Group) => {
     vscode.postMessage({
       type: EventTypes.AddGroup,
@@ -54,16 +51,17 @@ export const useSnippets = () => {
       type: EventTypes.DeleteSnippet,
       value: id,
     });
-    // ★ こちらも楽観的更新を削除し、バックエンドからのレスポンスに任せる
   };
 
-  // ★ 引数を string から string[] に変更
-  const runSnippet = (command: string[]) => {
+  // ▼▼▼【ここを修正】▼▼▼
+  // 引数を string[] から Snippet オブジェクトに変更
+  const runSnippet = (snippet: Snippet) => {
     vscode.postMessage({
       type: EventTypes.RunSnippet,
-      value: command,
+      value: snippet, // snippet オブジェクト全体を送信
     });
   };
+  // ▲▲▲【ここまで修正】▲▲▲
   
   return { snippets, groups, addSnippet, addGroup, deleteSnippet, runSnippet };
 };

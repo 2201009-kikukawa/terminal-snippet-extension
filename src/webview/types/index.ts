@@ -2,6 +2,7 @@ export interface Snippet {
   id: string;
   name: string;
   command: string[]; // ★ string から string[] に変更
+  isEdit: boolean; // ★ この行を追加
 }
 
 export interface Group {
