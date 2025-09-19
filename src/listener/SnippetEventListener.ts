@@ -7,7 +7,7 @@ import { Snippet, Group } from "../webview/types";
 
 export class SnippetEventListener {
   private readonly snippetsFile: string;
-  private readonly groupsFile: string; // ★ 追加
+  private readonly groupsFile: string;
 
   constructor(private readonly context: ExtensionContext) {
     // ★ スニペットファイルのパス設定
@@ -35,16 +35,16 @@ export class SnippetEventListener {
   }
 
   public setWebviewMessageListener(webviewView: WebviewView) {
+    // ▼▼▼【ここを修正】▼▼▼
+    // onDidReceiveMessage のコールバックを async に変更
     webviewView.webview.onDidReceiveMessage(async (message) => {
+    // ▲▲▲【ここまで修正】▲▲▲
       switch (message.type) {
         case EventTypes.AddSnippet:
-          // ★ webviewView を渡すように変更
           await this.handleAddSnippet(message.value, webviewView);
           break;
 
-        // ★ 以下を追加
         case EventTypes.AddGroup:
-          // ★ webviewView を渡すように変更
           await this.handleAddGroup(message.value, webviewView);
           break;
 
@@ -52,13 +52,14 @@ export class SnippetEventListener {
           this.handleGetSnippets(webviewView);
           break;
 
-        // ★ 以下を追加
         case EventTypes.GetGroups:
           this.handleGetGroups(webviewView);
           break;
 
         case EventTypes.RunSnippet:
-          this.handleRunSnippet(message.value); // ★ 変更
+          // ▼▼▼【ここを修正】▼▼▼
+          await this.handleRunSnippet(message.value); // await を追加
+          // ▲▲▲【ここまで修正】▲▲▲
           break;
 
         case EventTypes.DeleteSnippet:
@@ -68,7 +69,6 @@ export class SnippetEventListener {
     });
   }
 
-  // ★ 型を Group に変更
   private async handleAddGroup(group: Group, webviewView: WebviewView) {
     try {
       const currentGroups = this.readJsonFile<Group[]>(this.groupsFile, []);
@@ -81,7 +81,6 @@ export class SnippetEventListener {
     }
   }
 
-  // ★ handleAddSnippet を全面的に書き換え
   private async handleAddSnippet(
     data: { snippet: Snippet; groupId?: string },
     webviewView: WebviewView
@@ -144,7 +143,6 @@ export class SnippetEventListener {
     }
   }
 
-  // ★ 以下を追加
   private handleGetGroups(webviewView: WebviewView) {
     try {
       if (!fs.existsSync(this.groupsFile)) {
@@ -162,22 +160,54 @@ export class SnippetEventListener {
     }
   }
 
-  private handleRunSnippet(commands: string[]) {
-    if (!commands || commands.length === 0) {
+  // ▼▼▼【ここを修正】▼▼▼
+  // handleRunSnippet メソッドを全面的に書き換え
+  private async handleRunSnippet(snippet: Snippet) {
+    if (!snippet || !snippet.command || snippet.command.length === 0) {
       console.log("実行するコマンドがありません。");
       return;
     }
+
     try {
-      const terminal =
-        vscode.window.activeTerminal || vscode.window.createTerminal("Snippet Terminal");
-      terminal.show();
-      // ★ 複数のコマンドを ' && ' で連結して一度に送信
-      const fullCommand = commands.join(" && ");
-      terminal.sendText(fullCommand, true);
+      let commandToRun: string | undefined;
+      const initialCommand = snippet.command.join(" && ");
+
+      // isEdit フラグで分岐
+      if (snippet.isEdit) {
+        // Quick Pick (Input Box) を表示
+        const editedCommand = await vscode.window.showInputBox({
+          prompt: "実行するコマンドを編集、または確認してEnterキーを押してください",
+          value: initialCommand, // 保存されているコマンドを初期値として設定
+          ignoreFocusOut: true, // 入力中に他の場所をクリックしても閉じないようにする
+        });
+
+        // ユーザーがキャンセルしなければ (undefinedでなければ) コマンドを設定
+        // 空文字列も許可する（ユーザーが全削除して実行する場合も考慮）
+        if (editedCommand !== undefined) {
+          commandToRun = editedCommand;
+        }
+      } else {
+        // isEditがfalseなら、そのままコマンドを結合
+        commandToRun = initialCommand;
+      }
+
+      // 実行するコマンドがあればターミナルに送信
+      if (commandToRun) {
+        const terminal =
+          vscode.window.activeTerminal ||
+          vscode.window.createTerminal("Snippet Terminal");
+        terminal.show();
+        // ユーザーが空のコマンドを実行しようとした場合を除外
+        if(commandToRun.trim() !== "") {
+            terminal.sendText(commandToRun, true);
+        }
+      }
     } catch (error) {
       console.error("ターミナルへの送信失敗", error);
+      vscode.window.showErrorMessage("コマンドの実行に失敗しました。");
     }
   }
+  // ▲▲▲【ここまで修正】▲▲▲
 
   private handleDeleteSnippet(snippetId: string, webviewView: WebviewView) {
     try {
@@ -194,7 +224,7 @@ export class SnippetEventListener {
           type: EventTypes.SnippetsData,
           value: updatedSnippets,
         });
-        return; // 処理完了
+        return;
       }
   
       // 2. グループ化されていないスニペットになければ、グループの中から探す
@@ -223,7 +253,7 @@ export class SnippetEventListener {
           type: EventTypes.GroupsData,
           value: updatedGroups,
         });
-        return; // 処理完了
+        return;
       }
   
       // どこにも見つからなかった場合
@@ -233,10 +263,7 @@ export class SnippetEventListener {
       console.error("スニペットの削除中にエラーが発生しました", error);
     }
   }
-  // ▲▲▲【ここまで修正】▲▲▲
   
-
-  // ★ ユーティリティ関数を追加して重複を削減
   private readJsonFile<T>(filePath: string, defaultValue: T): T {
     if (!fs.existsSync(filePath)) {
       return defaultValue;

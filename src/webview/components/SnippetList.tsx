@@ -1,9 +1,8 @@
 import React, { useState } from "react";
-import { Snippet, Group } from "../types"; // ★ Group をインポート
+import { Snippet, Group } from "../types";
 import MeatballMenu from "./meatball/MeatballMenu";
 import Button from "./common/Button";
 
-// ▼ アコーディオンの開閉を示すシンプルなアイコン（お好みで変更してください）
 const AccordionIcon = ({ isOpen }: { isOpen: boolean }) => (
   <span
     style={{
@@ -16,10 +15,11 @@ const AccordionIcon = ({ isOpen }: { isOpen: boolean }) => (
   </span>
 );
 
-// ▼ 繰り返し利用するため、単一のスニペット表示を別コンポーネントに切り出します
 interface SnippetItemProps {
   snippet: Snippet;
-  onRunSnippet: (command: string[]) => void;
+  // ▼▼▼【ここを修正】▼▼▼
+  onRunSnippet: (snippet: Snippet) => void; // 引数の型を Snippet に変更
+  // ▲▲▲【ここまで修正】▲▲▲
   onEditSnippet: (snippet: Snippet) => void;
   onDeleteSnippet: (id: string) => void;
 }
@@ -34,28 +34,31 @@ const SnippetItem: React.FC<SnippetItemProps> = ({
     <Button
       appearance="secondary"
       className="snippet-name-button"
-      // ★ 複数のコマンドを `&&` で連結してツールチップに表示
       title={snippet.command.join(" && ")}
-      onClick={() => onRunSnippet(snippet.command)}>
+      // ▼▼▼【ここを修正】▼▼▼
+      onClick={() => onRunSnippet(snippet)} // snippet オブジェクトを渡す
+      // ▲▲▲【ここまで修正】▲▲▲
+    >
       {snippet.name}
     </Button>
     <MeatballMenu
       id={`meatball-menu-${snippet.id}`}
       menuItems={[
         { label: "削除", onClick: () => onDeleteSnippet(snippet.id) },
-        { label: "編集", onClick: () => onEditSnippet(snippet) }, // indexは不要なのでsnippetオブジェクト自体を渡す
+        { label: "編集", onClick: () => onEditSnippet(snippet) },
       ]}
     />
   </div>
 );
 
 
-// ▼ SnippetList が受け取るPropsを更新
 interface SnippetListProps {
-  groups: Group[]; // グループの配列
-  snippets: Snippet[]; // グループ化されていないスニペットの配列
-  onRunSnippet: (command: string[]) => void; // ★ string[] に変更
-  onEditSnippet: (snippet: Snippet) => void; // indexを使わない形に変更
+  groups: Group[];
+  snippets: Snippet[];
+  // ▼▼▼【ここを修正】▼▼▼
+  onRunSnippet: (snippet: Snippet) => void; // 引数の型を Snippet に変更
+  // ▲▲▲【ここまで修正】▲▲▲
+  onEditSnippet: (snippet: Snippet) => void;
   onDeleteSnippet: (id: string) => void;
 }
 
@@ -88,7 +91,6 @@ const SnippetList: React.FC<SnippetListProps> = ({
             <AccordionIcon isOpen={!!openGroups[group.id]} />
             <span className="group-name">{group.groupName}</span>
           </div>
-          {/* openGroups stateがtrueの場合のみ、中のスニペットを表示 */}
           {openGroups[group.id] && (
             <div className="group-snippets">
               {group.snippets.length > 0 ? (

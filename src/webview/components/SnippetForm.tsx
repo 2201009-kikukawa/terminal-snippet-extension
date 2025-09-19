@@ -1,36 +1,35 @@
 import React, { useState } from "react";
-// ▼▼▼【ここを修正】 VSCodeLink をインポート ▼▼▼
-import { VSCodeLink } from "@vscode/webview-ui-toolkit/react";
+import { VSCodeLink, VSCodeCheckbox } from "@vscode/webview-ui-toolkit/react";
 import { TextField, Button } from "./common";
-import { Snippet, Group } from "../types"; // ★ Group をインポート
+import { Snippet, Group } from "../types";
 
 interface SnippetFormProps {
-  // ★ onSubmit の型を groupId を受け取れるように変更
   onSubmit: (snippet: Snippet, groupId?: string) => void;
   onCancel: () => void;
-  groups: Group[]; // ★ groups を props で受け取る
+  groups: Group[];
 }
 
 const SnippetForm: React.FC<SnippetFormProps> = ({ onSubmit, onCancel, groups }) => {
   const [name, setName] = useState("");
-  // ★ command を文字列の配列で管理
   const [commands, setCommands] = useState<string[]>([""]);
-  const [selectedGroupId, setSelectedGroupId] = useState<string>(""); // ★ 選択されたグループIDを管理
+  const [selectedGroupId, setSelectedGroupId] = useState<string>("");
+  const [isEdit, setIsEdit] = useState(false); // ★ この行を追加
 
   const handleSubmit = () => {
     const newSnippet: Snippet = {
       id: crypto.randomUUID(),
       name: name.trim(),
       command: commands.map((cmd) => cmd.trim()).filter((cmd) => cmd !== ""),
+      isEdit: isEdit, // ★ この行を追加
     };
     
-    // スニペット名とコマンドが1つ以上入力されている場合のみ送信
     if (newSnippet.name && newSnippet.command.length > 0) {
       onSubmit(newSnippet, selectedGroupId || undefined);
       // フォームの状態をリセット
       setName("");
       setCommands([""]);
       setSelectedGroupId("");
+      setIsEdit(false); // ★ この行を追加
     }
   };
 
@@ -64,7 +63,6 @@ const SnippetForm: React.FC<SnippetFormProps> = ({ onSubmit, onCancel, groups })
         className="form-textfield"
         onInput={(e) => setName((e.target as HTMLInputElement).value)}
       />
-      {/* ★ commands配列を元にコマンド入力欄を動的に生成 */}
       {commands.map((command, index) => (
         <div key={index} className="command-input-container">
           <TextField
@@ -73,7 +71,6 @@ const SnippetForm: React.FC<SnippetFormProps> = ({ onSubmit, onCancel, groups })
             className="form-textfield"
             onInput={(e) => handleCommandChange(index, (e.target as HTMLInputElement).value)}
           />
-          {/* 入力欄が2つ以上ある場合に削除ボタンを表示 */}
           {commands.length > 1 && (
             <Button onClick={() => handleRemoveCommand(index)} appearance="icon" className="remove-command-button">
               ー
@@ -82,18 +79,27 @@ const SnippetForm: React.FC<SnippetFormProps> = ({ onSubmit, onCancel, groups })
         </div>
       ))}
 
-      {/* ▼▼▼【ここを修正】 Button を VSCodeLink に変更 ▼▼▼ */}
+      {/* ▼▼▼【ここから追加】▼▼▼ */}
+      <div className="form-check-container" style={{ margin: "2px 0" }}>
+        <VSCodeCheckbox
+          checked={isEdit}
+          onChange={(e: any) => setIsEdit(e.target.checked)}
+        >
+          実行前に編集する
+        </VSCodeCheckbox>
+      </div>
+      {/* ▲▲▲【ここまで追加】▲▲▲ */}
+
       <div className="add-command-link-container">
         <VSCodeLink href="#" onClick={handleAddAnotherCommand}>
           続けて実行するコマンドを追加
         </VSCodeLink>
       </div>
-      {/* ▲▲▲【ここまで修正】▲▲▲ */}
 
       <select
         value={selectedGroupId}
         onChange={(e) => setSelectedGroupId(e.target.value)}
-        className="form-select" // CSSは別途調整してください
+        className="form-select"
       >
         <option value="">グループなし</option>
         {groups.map((group) => (
