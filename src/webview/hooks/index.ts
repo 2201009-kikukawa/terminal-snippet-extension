@@ -53,15 +53,23 @@ export const useSnippets = () => {
     });
   };
 
-  // ▼▼▼【ここを修正】▼▼▼
-  // 引数を string[] から Snippet オブジェクトに変更
   const runSnippet = (snippet: Snippet) => {
     vscode.postMessage({
       type: EventTypes.RunSnippet,
       value: snippet, // snippet オブジェクト全体を送信
     });
   };
-  // ▲▲▲【ここまで修正】▲▲▲
+
+    // ▼▼▼【ここから追加】▼▼▼
+  const updateSnippet = (snippet: Snippet, groupId?: string) => {
+    vscode.postMessage({
+      type: EventTypes.UpdateSnippet,
+      value: { snippet, groupId },
+    });
+  };
+  // ▲▲▲【ここまで追加】▲▲▲
   
-  return { snippets, groups, addSnippet, addGroup, deleteSnippet, runSnippet };
+  // ▼▼▼【ここを修正】▼▼▼
+  return { snippets, groups, addSnippet, addGroup, deleteSnippet, runSnippet, updateSnippet };
+  // ▲▲▲【ここまで修正】▲▲▲
 };

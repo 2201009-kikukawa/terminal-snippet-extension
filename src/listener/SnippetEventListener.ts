@@ -35,10 +35,8 @@ export class SnippetEventListener {
   }
 
   public setWebviewMessageListener(webviewView: WebviewView) {
-    // ▼▼▼【ここを修正】▼▼▼
-    // onDidReceiveMessage のコールバックを async に変更
     webviewView.webview.onDidReceiveMessage(async (message) => {
-    // ▲▲▲【ここまで修正】▲▲▲
+
       switch (message.type) {
         case EventTypes.AddSnippet:
           await this.handleAddSnippet(message.value, webviewView);
@@ -57,14 +55,18 @@ export class SnippetEventListener {
           break;
 
         case EventTypes.RunSnippet:
-          // ▼▼▼【ここを修正】▼▼▼
-          await this.handleRunSnippet(message.value); // await を追加
-          // ▲▲▲【ここまで修正】▲▲▲
+          await this.handleRunSnippet(message.value);
           break;
 
         case EventTypes.DeleteSnippet:
           this.handleDeleteSnippet(message.value, webviewView);
           break;
+
+        // ▼▼▼【ここから追加】▼▼▼
+        case EventTypes.UpdateSnippet:
+          this.handleUpdateSnippet(message.value, webviewView);
+          break;
+        // ▲▲▲【ここまで追加】▲▲▲
       }
     });
   }
@@ -160,8 +162,6 @@ export class SnippetEventListener {
     }
   }
 
-  // ▼▼▼【ここを修正】▼▼▼
-  // handleRunSnippet メソッドを全面的に書き換え
   private async handleRunSnippet(snippet: Snippet) {
     if (!snippet || !snippet.command || snippet.command.length === 0) {
       console.log("実行するコマンドがありません。");
@@ -174,7 +174,6 @@ export class SnippetEventListener {
 
       // isEdit フラグで分岐
       if (snippet.isEdit) {
-        // Quick Pick (Input Box) を表示
         const editedCommand = await vscode.window.showInputBox({
           prompt: "実行するコマンドを編集、または確認してEnterキーを押してください",
           value: initialCommand, // 保存されているコマンドを初期値として設定
@@ -207,7 +206,6 @@ export class SnippetEventListener {
       vscode.window.showErrorMessage("コマンドの実行に失敗しました。");
     }
   }
-  // ▲▲▲【ここまで修正】▲▲▲
 
   private handleDeleteSnippet(snippetId: string, webviewView: WebviewView) {
     try {
@@ -263,6 +261,53 @@ export class SnippetEventListener {
       console.error("スニペットの削除中にエラーが発生しました", error);
     }
   }
+
+  // ▼▼▼【ここから追加】▼▼▼
+  private handleUpdateSnippet(
+    data: { snippet: Snippet; groupId?: string },
+    webviewView: WebviewView
+  ) {
+    try {
+      const { snippet: updatedSnippet, groupId: newGroupId } = data;
+
+      // --- 1. 元のスニペットを全箇所から削除 ---
+      const currentSnippets = this.readJsonFile<Snippet[]>(this.snippetsFile, []);
+      const nextSnippets = currentSnippets.filter((s) => s.id !== updatedSnippet.id);
+
+      const currentGroups = this.readJsonFile<Group[]>(this.groupsFile, []);
+      const nextGroups = currentGroups.map((group) => ({
+        ...group,
+        snippets: group.snippets.filter((s) => s.id !== updatedSnippet.id),
+      }));
+
+      // --- 2. 更新されたスニペットを新しい場所に追加 ---
+      if (newGroupId) {
+        const groupIndex = nextGroups.findIndex((g) => g.id === newGroupId);
+        if (groupIndex > -1) {
+          nextGroups[groupIndex].snippets.push(updatedSnippet);
+        } else {
+          console.error(`更新先のグループが見つかりません: ${newGroupId}`);
+          nextSnippets.push(updatedSnippet);
+        }
+      } else {
+        nextSnippets.push(updatedSnippet);
+      }
+
+      // --- 3. ファイルに書き戻す ---
+      this.writeJsonFile(this.snippetsFile, nextSnippets);
+      this.writeJsonFile(this.groupsFile, nextGroups);
+
+      console.log("スニペットを更新しました");
+
+      // --- 4. Webviewに最新データを送信 ---
+      this.handleGetSnippets(webviewView);
+      this.handleGetGroups(webviewView);
+    } catch (error) {
+      console.error("スニペットの更新に失敗しました", error);
+      vscode.window.showErrorMessage("スニペットの更新に失敗しました。");
+    }
+  }
+  // ▲▲▲【ここまで追加】▲▲▲
   
   private readJsonFile<T>(filePath: string, defaultValue: T): T {
     if (!fs.existsSync(filePath)) {

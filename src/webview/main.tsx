@@ -15,7 +15,12 @@ const App: React.FC = () => {
   const [showGroupForm, setShowGroupForm] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const { snippets, groups, addSnippet, deleteSnippet, runSnippet, addGroup } = useSnippets();
+  // ▼▼▼【ここを修正】▼▼▼
+  const { snippets, groups, addSnippet, addGroup, deleteSnippet, runSnippet, updateSnippet } = useSnippets();
+  const [editingContext, setEditingContext] = useState<{ snippet: Snippet; groupId?: string } | null>(
+    null
+  );
+  // ▲▲▲【ここまで修正】▲▲▲
 
   const handleDropdownToggle = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -53,10 +58,22 @@ const App: React.FC = () => {
     deleteSnippet(id);
   };
 
-  const handleEditSnippet = (snippet: Snippet) => {
-    // 編集機能は後で実装
-    console.log("Editing snippet:", snippet);
+  // ▼▼▼【ここから修正】▼▼▼
+  const handleEditSnippet = (snippet: Snippet, groupId?: string) => {
+    setEditingContext({ snippet, groupId });
   };
+
+  const handleUpdateSnippet = (snippet: Snippet, groupId?: string) => {
+    updateSnippet(snippet, groupId);
+    setEditingContext(null);
+  };
+
+  const handleCancelForm = () => {
+    setShowForm(false);
+    setShowGroupForm(false);
+    setEditingContext(null);
+  };
+  // ▲▲▲【ここまで修正】▲▲▲
 
   return (
     <MeatballMenuProvider>
@@ -92,15 +109,21 @@ const App: React.FC = () => {
         onDeleteSnippet={handleDeleteSnippet}
       />
 
-      {showForm && (
+      {/* ▼▼▼【ここを修正】▼▼▼ */}
+      {(showForm || editingContext) && !showGroupForm && (
         <SnippetForm
           onSubmit={handleAddSnippet}
-          onCancel={() => setShowForm(false)}
+          onUpdate={handleUpdateSnippet}
+          onCancel={handleCancelForm}
           groups={groups}
+          editingContext={editingContext}
         />
       )}
 
-      {showGroupForm && <GroupForm onSubmit={handleAddGroup} onCancel={() => setShowGroupForm(false)} />}
+      {showGroupForm && (
+        <GroupForm onSubmit={handleAddGroup} onCancel={handleCancelForm} />
+      )}
+      {/* ▲▲▲【ここまで修正】▲▲▲ */}
     </MeatballMenuProvider>
   );
 };

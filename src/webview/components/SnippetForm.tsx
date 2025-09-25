@@ -1,36 +1,63 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { VSCodeLink, VSCodeCheckbox } from "@vscode/webview-ui-toolkit/react";
 import { TextField, Button } from "./common";
 import { Snippet, Group } from "../types";
 
+// ▼▼▼【ここから修正】▼▼▼
 interface SnippetFormProps {
   onSubmit: (snippet: Snippet, groupId?: string) => void;
+  onUpdate: (snippet: Snippet, groupId?: string) => void;
   onCancel: () => void;
   groups: Group[];
+  editingContext: { snippet: Snippet; groupId?: string } | null;
 }
+// ▲▲▲【ここまで修正】▲▲▲
 
-const SnippetForm: React.FC<SnippetFormProps> = ({ onSubmit, onCancel, groups }) => {
+const SnippetForm: React.FC<SnippetFormProps> = ({
+  onSubmit, 
+  // ▼▼▼【ここから修正】▼▼▼
+  onUpdate,
+  onCancel,
+  groups,
+  editingContext,
+  // ▲▲▲【ここまで修正】▲▲▲
+}) => {
   const [name, setName] = useState("");
   const [commands, setCommands] = useState<string[]>([""]);
   const [selectedGroupId, setSelectedGroupId] = useState<string>("");
   const [isEdit, setIsEdit] = useState(false); // ★ この行を追加
 
+    // ▼▼▼【ここから追加】▼▼▼
+  const isEditing = !!editingContext;
+
+  useEffect(() => {
+    if (isEditing) {
+      const { snippet, groupId } = editingContext;
+      setName(snippet.name);
+      setCommands(snippet.command.length > 0 ? snippet.command : [""]);
+      setIsEdit(snippet.isEdit);
+      setSelectedGroupId(groupId || "");
+    }
+  }, [editingContext, isEditing]);
+  // ▲▲▲【ここまで追加】▲▲▲
+
   const handleSubmit = () => {
-    const newSnippet: Snippet = {
-      id: crypto.randomUUID(),
+    // ▼▼▼【ここを修正】▼▼▼
+    const snippetData: Snippet = {
+      id: isEditing ? editingContext.snippet.id : crypto.randomUUID(),
       name: name.trim(),
       command: commands.map((cmd) => cmd.trim()).filter((cmd) => cmd !== ""),
-      isEdit: isEdit, // ★ この行を追加
+      isEdit: isEdit,
     };
-    
-    if (newSnippet.name && newSnippet.command.length > 0) {
-      onSubmit(newSnippet, selectedGroupId || undefined);
-      // フォームの状態をリセット
-      setName("");
-      setCommands([""]);
-      setSelectedGroupId("");
-      setIsEdit(false); // ★ この行を追加
+
+    if (snippetData.name && snippetData.command.length > 0) {
+      if (isEditing) {
+        onUpdate(snippetData, selectedGroupId || undefined);
+      } else {
+        onSubmit(snippetData, selectedGroupId || undefined);
+      }
     }
+    // ▲▲▲【ここまで修正】▲▲▲
   };
 
   // ★ コマンド入力欄を追加する関数
@@ -56,13 +83,27 @@ const SnippetForm: React.FC<SnippetFormProps> = ({ onSubmit, onCancel, groups })
 
   return (
     <div className="form-container">
-      <h3>新規登録フォーム</h3>
-      <TextField
-        value={name}
-        placeholder="スニペット名"
-        className="form-textfield"
-        onInput={(e) => setName((e.target as HTMLInputElement).value)}
-      />
+      {/* ▼▼▼【ここを修正】▼▼▼ */}
+      <h3>{isEditing ? "編集フォーム" : "新規登録フォーム"}</h3>
+      {/* ▲▲▲【ここまで修正】▲▲▲ */}
+      {/* ▼▼▼【ここから修正】▼▼▼ */}
+      <div>
+        <label>
+          名前
+        </label>
+        <TextField
+          value={name}
+          placeholder="スニペット名"
+          className="form-textfield"
+          onInput={(e) => setName((e.target as HTMLInputElement).value)}
+        />
+      </div>
+
+      <div>
+        <label>
+          コマンド
+        </label>
+        {/* ▲▲▲【ここまで修正】▲▲▲ */}
       {commands.map((command, index) => (
         <div key={index} className="command-input-container">
           <TextField
@@ -78,6 +119,7 @@ const SnippetForm: React.FC<SnippetFormProps> = ({ onSubmit, onCancel, groups })
           )}
         </div>
       ))}
+    </div> {/* commandsのform-groupはここで閉じる */}
 
       {/* ▼▼▼【ここから追加】▼▼▼ */}
       <div className="form-check-container" style={{ margin: "2px 0" }}>
@@ -109,10 +151,12 @@ const SnippetForm: React.FC<SnippetFormProps> = ({ onSubmit, onCancel, groups })
         ))}
       </select>
       <div className="form-actions">
-        <Button onClick={handleSubmit}>登録</Button>
+        {/* ▼▼▼【ここを修正】▼▼▼ */}
+        <Button onClick={handleSubmit}>{isEditing ? "更新" : "登録"}</Button>
         <Button onClick={onCancel} appearance="secondary">
-          閉じる
+          {isEditing ? "戻る" : "閉じる"}
         </Button>
+        {/* ▲▲▲【ここまで修正】▲▲▲ */}
       </div>
     </div>
   );
