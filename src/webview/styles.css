@@ -26,15 +26,25 @@
   border-radius: 5px;
 }
 
-.form-textfield {
-  display: block; /* VSCodeTextFieldはインライン要素なのでブロック要素にする */
-  width: 100%;
-  margin-bottom: 0.5em;
+/* ▼▼▼【ここから修正】▼▼▼ */
+
+/* 各入力項目（ラベル、入力欄、エラーメッセージ）をまとめるグループ */
+.form-group {
+  margin-bottom: 0.8em; /* グループ間の余白をここで管理します */
 }
+
+.form-textfield {
+  display: block;
+  width: 100%;
+  /* margin-bottom: 0.5em; ← この行を削除します。これにより入力欄とエラーメッセージが近づきます */
+}
+
+/* ▲▲▲【ここまで修正】▲▲▲ */
 
 .form-actions {
   display: flex;
   gap: 0.5em;
+  margin-top: 2px;
   justify-content: flex-end;
 }
 
@@ -112,8 +122,10 @@
 .command-input-container {
   display: flex;
   align-items: center;
-  margin-bottom: 1px;
-  margin-top: 1px;
+/* ▼▼▼【ここを修正】▼▼▼ */
+  margin-bottom: 4px; /* コマンド入力欄が複数ある場合の間隔を少し調整 */
+  margin-top: 0;
+/* ▲▲▲【ここまで修正】▲▲▲ */
   width: 100%;
 }
 
@@ -123,7 +135,6 @@
 
 .remove-command-button {
   margin-left: 5px;
-  margin-bottom: 3px;
   min-width: 20px;
   height: 20px;
   padding: 0;
@@ -134,4 +145,10 @@
   border: 1px solid var(--vscode-errorForeground);
   /* 3. ボタンを円形にする */
   border-radius: 50%;
+}
+
+.error-message {
+  color: var(--vscode-errorForeground);
+  font-size: 12px;
+  margin-top: 4px;
 }

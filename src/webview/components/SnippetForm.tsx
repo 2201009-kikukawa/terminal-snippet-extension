@@ -3,7 +3,6 @@ import { VSCodeLink, VSCodeCheckbox } from "@vscode/webview-ui-toolkit/react";
 import { TextField, Button } from "./common";
 import { Snippet, Group } from "../types";
 
-// ▼▼▼【ここから修正】▼▼▼
 interface SnippetFormProps {
   onSubmit: (snippet: Snippet, groupId?: string) => void;
   onUpdate: (snippet: Snippet, groupId?: string) => void;
@@ -11,23 +10,24 @@ interface SnippetFormProps {
   groups: Group[];
   editingContext: { snippet: Snippet; groupId?: string } | null;
 }
-// ▲▲▲【ここまで修正】▲▲▲
 
 const SnippetForm: React.FC<SnippetFormProps> = ({
   onSubmit, 
-  // ▼▼▼【ここから修正】▼▼▼
   onUpdate,
   onCancel,
   groups,
   editingContext,
-  // ▲▲▲【ここまで修正】▲▲▲
 }) => {
   const [name, setName] = useState("");
   const [commands, setCommands] = useState<string[]>([""]);
   const [selectedGroupId, setSelectedGroupId] = useState<string>("");
-  const [isEdit, setIsEdit] = useState(false); // ★ この行を追加
+  const [isEdit, setIsEdit] = useState(false);
 
-    // ▼▼▼【ここから追加】▼▼▼
+  // ▼▼▼【ここから追加】▼▼▼
+  const [nameError, setNameError] = useState("");
+  const [commandError, setCommandError] = useState("");
+  // ▲▲▲【ここまで追加】▲▲▲
+
   const isEditing = !!editingContext;
 
   useEffect(() => {
@@ -39,23 +39,42 @@ const SnippetForm: React.FC<SnippetFormProps> = ({
       setSelectedGroupId(groupId || "");
     }
   }, [editingContext, isEditing]);
-  // ▲▲▲【ここまで追加】▲▲▲
 
   const handleSubmit = () => {
-    // ▼▼▼【ここを修正】▼▼▼
+    // ▼▼▼【ここから修正】▼▼▼
+    // バリデーションエラーをリセット
+    setNameError("");
+    setCommandError("");
+
+    const trimmedName = name.trim();
+    const nonEmptyCommands = commands.map((cmd) => cmd.trim()).filter((cmd) => cmd !== "");
+
+    // バリデーションチェック
+    let hasError = false;
+    if (!trimmedName) {
+      setNameError("名前を入力してください。");
+      hasError = true;
+    }
+    if (nonEmptyCommands.length === 0) {
+      setCommandError("コマンドを1つ以上入力してください。");
+      hasError = true;
+    }
+
+    if (hasError) {
+      return; // エラーがあればここで処理を中断
+    }
+
     const snippetData: Snippet = {
       id: isEditing ? editingContext.snippet.id : crypto.randomUUID(),
-      name: name.trim(),
-      command: commands.map((cmd) => cmd.trim()).filter((cmd) => cmd !== ""),
+      name: trimmedName,
+      command: nonEmptyCommands,
       isEdit: isEdit,
     };
 
-    if (snippetData.name && snippetData.command.length > 0) {
-      if (isEditing) {
-        onUpdate(snippetData, selectedGroupId || undefined);
-      } else {
-        onSubmit(snippetData, selectedGroupId || undefined);
-      }
+    if (isEditing) {
+      onUpdate(snippetData, selectedGroupId || undefined);
+    } else {
+      onSubmit(snippetData, selectedGroupId || undefined);
     }
     // ▲▲▲【ここまで修正】▲▲▲
   };
@@ -83,11 +102,9 @@ const SnippetForm: React.FC<SnippetFormProps> = ({
 
   return (
     <div className="form-container">
-      {/* ▼▼▼【ここを修正】▼▼▼ */}
       <h3>{isEditing ? "編集フォーム" : "新規登録フォーム"}</h3>
-      {/* ▲▲▲【ここまで修正】▲▲▲ */}
       {/* ▼▼▼【ここから修正】▼▼▼ */}
-      <div>
+      <div className="form-group">
         <label>
           名前
         </label>
@@ -97,31 +114,33 @@ const SnippetForm: React.FC<SnippetFormProps> = ({
           className="form-textfield"
           onInput={(e) => setName((e.target as HTMLInputElement).value)}
         />
+        {nameError && <p className="error-message">{nameError}</p>}
       </div>
 
-      <div>
+      <div className="form-group">
         <label>
           コマンド
         </label>
-        {/* ▲▲▲【ここまで修正】▲▲▲ */}
-      {commands.map((command, index) => (
-        <div key={index} className="command-input-container">
-          <TextField
-            value={command}
-            placeholder={`実行コマンド ${index + 1}`}
-            className="form-textfield"
-            onInput={(e) => handleCommandChange(index, (e.target as HTMLInputElement).value)}
-          />
-          {commands.length > 1 && (
-            <Button onClick={() => handleRemoveCommand(index)} appearance="icon" className="remove-command-button">
-              ー
-            </Button>
-          )}
-        </div>
-      ))}
-    </div> {/* commandsのform-groupはここで閉じる */}
+        {commands.map((command, index) => (
+          <div key={index} className="command-input-container">
+            <TextField
+              value={command}
+              placeholder={`実行コマンド ${index + 1}`}
+              className="form-textfield"
+              onInput={(e) => handleCommandChange(index, (e.target as HTMLInputElement).value)}
+            />
+            {commands.length > 1 && (
+              <Button onClick={() => handleRemoveCommand(index)} appearance="icon" className="remove-command-button">
+                ー
+              </Button>
+            )}
+          </div>
+        ))}
+        {commandError && <p className="error-message">{commandError}</p>}
+      </div>
+      {/* ▲▲▲【ここまで修正】▲▲▲ */}
 
-      {/* ▼▼▼【ここから追加】▼▼▼ */}
+    <div className="form-group">
       <div className="form-check-container" style={{ margin: "2px 0" }}>
         <VSCodeCheckbox
           checked={isEdit}
@@ -130,14 +149,15 @@ const SnippetForm: React.FC<SnippetFormProps> = ({
           実行前に編集する
         </VSCodeCheckbox>
       </div>
-      {/* ▲▲▲【ここまで追加】▲▲▲ */}
 
       <div className="add-command-link-container">
         <VSCodeLink href="#" onClick={handleAddAnotherCommand}>
           続けて実行するコマンドを追加
         </VSCodeLink>
       </div>
+    </div>
 
+    <div className="form-group">
       <select
         value={selectedGroupId}
         onChange={(e) => setSelectedGroupId(e.target.value)}
@@ -150,13 +170,13 @@ const SnippetForm: React.FC<SnippetFormProps> = ({
           </option>
         ))}
       </select>
+    </div>
+
       <div className="form-actions">
-        {/* ▼▼▼【ここを修正】▼▼▼ */}
         <Button onClick={handleSubmit}>{isEditing ? "更新" : "登録"}</Button>
         <Button onClick={onCancel} appearance="secondary">
           {isEditing ? "戻る" : "閉じる"}
         </Button>
-        {/* ▲▲▲【ここまで修正】▲▲▲ */}
       </div>
     </div>
   );
