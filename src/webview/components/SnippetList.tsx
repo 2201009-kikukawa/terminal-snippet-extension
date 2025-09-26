@@ -17,11 +17,14 @@ const AccordionIcon = ({ isOpen }: { isOpen: boolean }) => (
 
 interface SnippetItemProps {
   snippet: Snippet;
+  onRunSnippet: (snippet: Snippet) => void;
   // ▼▼▼【ここを修正】▼▼▼
-  onRunSnippet: (snippet: Snippet) => void; // 引数の型を Snippet に変更
+  onEditSnippet: (snippet: Snippet, groupId?: string) => void;
   // ▲▲▲【ここまで修正】▲▲▲
-  onEditSnippet: (snippet: Snippet) => void;
   onDeleteSnippet: (id: string) => void;
+  // ▼▼▼【ここから追加】▼▼▼
+  groupId?: string;
+  // ▲▲▲【ここまで追加】▲▲▲
 }
 
 const SnippetItem: React.FC<SnippetItemProps> = ({
@@ -29,15 +32,16 @@ const SnippetItem: React.FC<SnippetItemProps> = ({
   onRunSnippet,
   onEditSnippet,
   onDeleteSnippet,
+  // ▼▼▼【ここから追加】▼▼▼
+  groupId,
+  // ▲▲▲【ここまで追加】▲▲▲
 }) => (
   <div className="snippet-item">
     <Button
       appearance="secondary"
       className="snippet-name-button"
       title={snippet.command.join(" && ")}
-      // ▼▼▼【ここを修正】▼▼▼
       onClick={() => onRunSnippet(snippet)} // snippet オブジェクトを渡す
-      // ▲▲▲【ここまで修正】▲▲▲
     >
       {snippet.name}
     </Button>
@@ -45,7 +49,9 @@ const SnippetItem: React.FC<SnippetItemProps> = ({
       id={`meatball-menu-${snippet.id}`}
       menuItems={[
         { label: "削除", onClick: () => onDeleteSnippet(snippet.id) },
-        { label: "編集", onClick: () => onEditSnippet(snippet) },
+        // ▼▼▼【ここを修正】▼▼▼
+        { label: "編集", onClick: () => onEditSnippet(snippet, groupId) },
+        // ▲▲▲【ここまで修正】▲▲▲
       ]}
     />
   </div>
@@ -55,10 +61,10 @@ const SnippetItem: React.FC<SnippetItemProps> = ({
 interface SnippetListProps {
   groups: Group[];
   snippets: Snippet[];
+  onRunSnippet: (snippet: Snippet) => void;
   // ▼▼▼【ここを修正】▼▼▼
-  onRunSnippet: (snippet: Snippet) => void; // 引数の型を Snippet に変更
+  onEditSnippet: (snippet: Snippet, groupId?: string) => void;
   // ▲▲▲【ここまで修正】▲▲▲
-  onEditSnippet: (snippet: Snippet) => void;
   onDeleteSnippet: (id: string) => void;
 }
 
@@ -101,6 +107,9 @@ const SnippetList: React.FC<SnippetListProps> = ({
                     onRunSnippet={onRunSnippet}
                     onEditSnippet={onEditSnippet}
                     onDeleteSnippet={onDeleteSnippet}
+                    // ▼▼▼【ここから追加】▼▼▼
+                    groupId={group.id}
+                    // ▲▲▲【ここまで追加】▲▲▲
                   />
                 ))
               ) : (
