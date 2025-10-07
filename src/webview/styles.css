@@ -152,3 +152,17 @@
   font-size: 12px;
   margin-top: 4px;
 }
+
+/* ▼▼▼【ここから追加】▼▼▼ */
+.search-bar-container {
+  margin-top: 8px; /* ボタンとの間隔を空ける */
+  margin-bottom: 8px;
+}
+
+.search-input {
+  width: 100%;
+  box-sizing: border-box; /* paddingを含めてwidthを100%に保つ */
+  /* ▼▼▼【ここから修正】▼▼▼ */
+  border-radius: 4px; /* 角を少し丸める */
+}
+/* ▲▲▲【ここまで追加】▲▲▲ */
