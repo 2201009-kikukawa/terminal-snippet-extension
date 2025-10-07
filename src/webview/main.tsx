@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useMemo } from "react"; // ◀◀◀【ここを修正】
 import ReactDOM from "react-dom/client";
 import { useSnippets } from "./hooks";
 import SnippetList from "./components/SnippetList";
@@ -6,7 +6,7 @@ import SnippetForm from "./components/SnippetForm";
 import GroupForm from "./components/GroupForm";
 import { MeatballMenuProvider } from "./components/meatball/MeatballMenuContext";
 import { Snippet, Group } from "./types";
-import { Button, Option } from "./components/common";
+import { Button, Option, TextField } from "./components/common"; // ◀◀◀【ここを修正】
 import "./styles.css";
 import ChevronDownIcon from "../icons/ChevronDownIcon";
 
@@ -14,13 +14,42 @@ const App: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [showGroupForm, setShowGroupForm] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  // ▼▼▼【ここから追加】▼▼▼
+  const [searchTerm, setSearchTerm] = useState("");
+  // ▲▲▲【ここまで追加】▲▲▲
   const dropdownRef = useRef<HTMLDivElement>(null);
-  // ▼▼▼【ここを修正】▼▼▼
   const { snippets, groups, addSnippet, addGroup, deleteSnippet, runSnippet, updateSnippet } = useSnippets();
   const [editingContext, setEditingContext] = useState<{ snippet: Snippet; groupId?: string } | null>(
     null
   );
-  // ▲▲▲【ここまで修正】▲▲▲
+
+  // ▼▼▼【ここから追加】▼▼▼
+  const filteredData = useMemo(() => {
+    if (!searchTerm.trim()) {
+      return { filteredSnippets: snippets, filteredGroups: groups };
+    }
+
+    const lowercasedFilter = searchTerm.toLowerCase();
+
+    const snippetFilter = (snippet: Snippet) =>
+      snippet.name.toLowerCase().includes(lowercasedFilter) ||
+      snippet.command.some((cmd) => cmd.toLowerCase().includes(lowercasedFilter));
+
+    const filteredSnippets = snippets.filter(snippetFilter);
+
+    const filteredGroups = groups
+      .map((group) => {
+        const matchingSnippets = group.snippets.filter(snippetFilter);
+        if (matchingSnippets.length > 0) {
+          return { ...group, snippets: matchingSnippets };
+        }
+        return null;
+      })
+      .filter((group): group is Group => group !== null);
+
+    return { filteredSnippets, filteredGroups };
+  }, [searchTerm, snippets, groups]);
+  // ▲▲▲【ここまで追加】▲▲▲
 
   const handleDropdownToggle = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -58,7 +87,6 @@ const App: React.FC = () => {
     deleteSnippet(id);
   };
 
-  // ▼▼▼【ここから修正】▼▼▼
   const handleEditSnippet = (snippet: Snippet, groupId?: string) => {
     setEditingContext({ snippet, groupId });
   };
@@ -73,7 +101,6 @@ const App: React.FC = () => {
     setShowGroupForm(false);
     setEditingContext(null);
   };
-  // ▲▲▲【ここまで修正】▲▲▲
 
   return (
     <MeatballMenuProvider>
@@ -101,15 +128,29 @@ const App: React.FC = () => {
         )}
       </div>
 
+      {/* ▼▼▼【ここから追加】▼▼▼ */}
+      <div className="search-bar-container">
+        <TextField
+          // ▼▼▼【ここを修正】▼▼▼
+          placeholder="検索"
+          // ▲▲▲【ここまで修正】▲▲▲
+          value={searchTerm}
+          onInput={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
+          className="search-input"
+        />
+      </div>
+      {/* ▲▲▲【ここまで追加】▲▲▲ */}
+
       <SnippetList
-        groups={groups}
-        snippets={snippets}
+        // ▼▼▼【ここを修正】▼▼▼
+        groups={filteredData.filteredGroups}
+        snippets={filteredData.filteredSnippets}
+        // ▲▲▲【ここまで修正】▲▲▲
         onRunSnippet={runSnippet}
         onEditSnippet={handleEditSnippet}
         onDeleteSnippet={handleDeleteSnippet}
       />
 
-      {/* ▼▼▼【ここを修正】▼▼▼ */}
       {(showForm || editingContext) && !showGroupForm && (
         <SnippetForm
           onSubmit={handleAddSnippet}
@@ -123,7 +164,6 @@ const App: React.FC = () => {
       {showGroupForm && (
         <GroupForm onSubmit={handleAddGroup} onCancel={handleCancelForm} />
       )}
-      {/* ▲▲▲【ここまで修正】▲▲▲ */}
     </MeatballMenuProvider>
   );
 };
