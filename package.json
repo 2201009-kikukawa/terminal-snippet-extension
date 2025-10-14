@@ -2,7 +2,7 @@
   "name": "TerminalSnippet-04251226",
   "displayName": "terminalSnippet",
   "description": "terminalSnippet is a VSCode extension that allows you to create and manage terminal snippets.",
-  "version": "0.0.1",
+  "version": "1.0.1",
   "publisher": "VS-Modules",
   "repository": {
     "type": "git",
