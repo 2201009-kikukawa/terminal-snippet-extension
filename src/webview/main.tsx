@@ -21,10 +21,7 @@ import {
   DragStartEvent,
   DragOverlay,
 } from "@dnd-kit/core";
-import {
-  arrayMove,
-  sortableKeyboardCoordinates,
-} from "@dnd-kit/sortable";
+import { arrayMove, sortableKeyboardCoordinates } from "@dnd-kit/sortable";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 // SnippetList から SnippetItem と AccordionIcon をインポート
 import { SnippetItem, AccordionIcon } from "./components/SnippetList";
@@ -70,9 +67,7 @@ const App: React.FC = () => {
 
     const snippetFilter = (snippet: Snippet) =>
       snippet.name.toLowerCase().includes(lowercasedFilter) ||
-      snippet.command.some((cmd) =>
-        cmd.toLowerCase().includes(lowercasedFilter)
-      );
+      snippet.command.some((cmd) => cmd.toLowerCase().includes(lowercasedFilter));
 
     const filteredSnippets = snippets.filter(snippetFilter);
 
@@ -92,7 +87,11 @@ const App: React.FC = () => {
 
   // ▼▼▼【ここから追加】▼▼▼
   const sensors = useSensors(
-    useSensor(PointerSensor),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8, // 8px移動してからドラッグ開始
+      },
+    }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
@@ -158,9 +157,7 @@ const App: React.FC = () => {
           const oldSnippetIndex = newGroups[groupIndex].snippets.findIndex(
             (s) => s.id === activeId
           );
-          const newSnippetIndex = newGroups[groupIndex].snippets.findIndex(
-            (s) => s.id === overId
-          );
+          const newSnippetIndex = newGroups[groupIndex].snippets.findIndex((s) => s.id === overId);
           newGroups[groupIndex].snippets = arrayMove(
             newGroups[groupIndex].snippets,
             oldSnippetIndex,
@@ -188,10 +185,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setIsMenuOpen(false);
       }
     };
@@ -243,10 +237,7 @@ const App: React.FC = () => {
           <Button className="add-button" onClick={() => setShowForm(true)}>
             スニペットを追加する
           </Button>
-          <Button
-            className="add-dropdown-button"
-            onClick={handleDropdownToggle}
-          >
+          <Button className="add-dropdown-button" onClick={handleDropdownToggle}>
             <ChevronDownIcon />
           </Button>
         </div>
@@ -257,8 +248,7 @@ const App: React.FC = () => {
               onClick={() => {
                 setShowGroupForm(true);
                 setIsMenuOpen(false);
-              }}
-            >
+              }}>
               グループを追加
             </Option>
           </div>
@@ -269,9 +259,7 @@ const App: React.FC = () => {
         <TextField
           placeholder="検索"
           value={searchTerm}
-          onInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setSearchTerm(e.target.value)
-          }
+          onInput={(e: React.ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
           className="search-input"
         />
       </div>
@@ -302,13 +290,10 @@ const App: React.FC = () => {
                 style={{
                   backgroundColor: "var(--vscode-sideBar-background)",
                   opacity: 0.9,
-                }}
-              >
+                }}>
                 <DragHandleIcon className="drag-handle" />
                 <AccordionIcon isOpen={false} />
-                <span className="group-name">
-                  {(activeItem as Group).groupName}
-                </span>
+                <span className="group-name">{(activeItem as Group).groupName}</span>
               </div>
             ) : (
               // スニペットのオーバーレイ
@@ -336,9 +321,7 @@ const App: React.FC = () => {
         />
       )}
 
-      {showGroupForm && (
-        <GroupForm onSubmit={handleAddGroup} onCancel={handleCancelForm} />
-      )}
+      {showGroupForm && <GroupForm onSubmit={handleAddGroup} onCancel={handleCancelForm} />}
     </MeatballMenuProvider>
   );
 };

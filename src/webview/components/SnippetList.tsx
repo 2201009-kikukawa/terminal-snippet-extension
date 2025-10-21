@@ -12,15 +12,14 @@ import DragHandleIcon from "../../icons/DragHandleIcon";
 // ▼▼▼【ここから修正】▼▼▼
 // main.tsxでインポートするためにexportする
 export const AccordionIcon = ({ isOpen }: { isOpen: boolean }) => (
-// ▲▲▲【ここまで修正】▲▲▲
+  // ▲▲▲【ここまで修正】▲▲▲
   <span
     style={{
       display: "inline-block",
       transform: isOpen ? "rotate(90deg)" : "rotate(0deg)",
       transition: "transform 0.2s",
       marginRight: "8px",
-    }}
-  >
+    }}>
     ▶
   </span>
 );
@@ -41,7 +40,7 @@ interface SnippetItemProps {
 // ▼▼▼【ここから修正】▼▼▼
 // main.tsxでインポートするためにexportする
 export const SnippetItem: React.FC<SnippetItemProps> = ({
-// ▲▲▲【ここまで修正】▲▲▲
+  // ▲▲▲【ここまで修正】▲▲▲
   snippet,
   onRunSnippet,
   onEditSnippet,
@@ -51,47 +50,54 @@ export const SnippetItem: React.FC<SnippetItemProps> = ({
   dragAttributes,
   dragListeners,
   // ▲▲▲【ここまで追加】▲▲▲
-}) => (
-  // ▼▼▼【ここから修正】▼▼▼
-  <div className="snippet-item">
-    <DragHandleIcon
-      className="drag-handle"
-      {...dragAttributes}
-      {...dragListeners}
-    />
-    {/* ▲▲▲【ここまで修正】▲▲▲ */}
-    <Button
-      appearance="secondary"
-      className="snippet-name-button"
-      title={snippet.command.join(" && ")}
-      onClick={() => onRunSnippet(snippet)}
-    >
-      {snippet.name}
-    </Button>
-    <MeatballMenu
-      id={`meatball-menu-${snippet.id}`}
-      menuItems={[
-        { label: "編集", onClick: () => onEditSnippet(snippet, groupId) },
-        { label: "削除", onClick: () => onDeleteSnippet(snippet.id) },
-      ]}
-    />
-  </div>
-);
+}) => {
+  const handleDragHandleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log(`スニペット "${snippet.name}" のドラッグハンドルがクリックされました！🎯`);
+  };
+
+  return (
+    // ▼▼▼【ここから修正】▼▼▼
+    <div className="snippet-item">
+      <DragHandleIcon
+        className="drag-handle"
+        onHandleClick={handleDragHandleClick}
+        {...dragAttributes}
+        {...dragListeners}
+      />
+      {/* ▲▲▲【ここまで修正】▲▲▲ */}
+      <Button
+        appearance="secondary"
+        className="snippet-name-button"
+        title={snippet.command.join(" && ")}
+        onClick={() => onRunSnippet(snippet)}>
+        {snippet.name}
+      </Button>
+      <MeatballMenu
+        id={`meatball-menu-${snippet.id}`}
+        menuItems={[
+          { label: "編集", onClick: () => onEditSnippet(snippet, groupId) },
+          { label: "削除", onClick: () => onDeleteSnippet(snippet.id) },
+        ]}
+      />
+    </div>
+  );
+};
 
 // ▼▼▼【ここから修正】▼▼▼
 // propsからdrag関連の型を除外
-const SortableSnippetItem: React.FC<
-  Omit<SnippetItemProps, "dragAttributes" | "dragListeners">
-> = (props) => {
+const SortableSnippetItem: React.FC<Omit<SnippetItemProps, "dragAttributes" | "dragListeners">> = (
+  props
+) => {
   // isDragging を受け取る
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-    useSortable({
-      id: props.snippet.id,
-      data: {
-        type: "snippet",
-        groupId: props.groupId,
-      },
-    });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: props.snippet.id,
+    data: {
+      type: "snippet",
+      groupId: props.groupId,
+    },
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -114,7 +120,6 @@ const SortableSnippetItem: React.FC<
   );
 };
 // ▲▲▲【ここまで修正】▲▲▲
-
 
 interface SnippetListProps {
   groups: Group[];
@@ -197,19 +202,26 @@ const SortableGroup: React.FC<SortableGroupProps> = ({
   onEditSnippet,
   onDeleteSnippet,
 }) => {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: group.id,
     data: {
       type: "group",
     },
   });
+
+  const handleDragHandleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log(`グループ "${group.groupName}" のドラッグハンドルがクリックされました！📁`);
+    // VSCodeのWebviewからメッセージを送信してバックエンドでログ出力
+    const vscode = (window as any).acquireVsCodeApi?.();
+    if (vscode) {
+      vscode.postMessage({
+        type: "debug",
+        value: `グループ "${group.groupName}" のドラッグハンドルがクリックされました！📁`,
+      });
+    }
+  };
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -227,6 +239,7 @@ const SortableGroup: React.FC<SortableGroupProps> = ({
       <div className="group-header" onClick={() => onToggle(group.id)}>
         <DragHandleIcon
           className="drag-handle"
+          onHandleClick={handleDragHandleClick}
           {...attributes}
           {...listeners}
           onClick={(e) => e.stopPropagation()} // ヘッダーのonClickが発火しないようにする
@@ -238,7 +251,9 @@ const SortableGroup: React.FC<SortableGroupProps> = ({
       {isOpen && (
         <div className="group-snippets">
           {/* グループ内スニペットをSortableにする */}
-          <SortableContext items={group.snippets.map((s) => s.id)} strategy={verticalListSortingStrategy}>
+          <SortableContext
+            items={group.snippets.map((s) => s.id)}
+            strategy={verticalListSortingStrategy}>
             {group.snippets.length > 0 ? (
               group.snippets.map((snippet) => (
                 <SortableSnippetItem
@@ -251,9 +266,7 @@ const SortableGroup: React.FC<SortableGroupProps> = ({
                 />
               ))
             ) : (
-              <p className="no-snippets-in-group">
-                このグループにスニペットはありません
-              </p>
+              <p className="no-snippets-in-group">このグループにスニペットはありません</p>
             )}
           </SortableContext>
         </div>
