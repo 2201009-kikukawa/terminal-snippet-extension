@@ -62,9 +62,13 @@ export class SnippetEventListener {
           this.handleDeleteSnippet(message.value, webviewView);
           break;
 
-        // ▼▼▼【ここから追加】▼▼▼
         case EventTypes.UpdateSnippet:
           this.handleUpdateSnippet(message.value, webviewView);
+          break;
+
+        // ▼▼▼【ここから追加】▼▼▼
+        case EventTypes.UpdateOrder:
+          this.handleUpdateOrder(message.value);
           break;
         // ▲▲▲【ここまで追加】▲▲▲
       }
@@ -262,7 +266,6 @@ export class SnippetEventListener {
     }
   }
 
-  // ▼▼▼【ここから追加】▼▼▼
   private handleUpdateSnippet(
     data: { snippet: Snippet; groupId?: string },
     webviewView: WebviewView
@@ -305,6 +308,22 @@ export class SnippetEventListener {
     } catch (error) {
       console.error("スニペットの更新に失敗しました", error);
       vscode.window.showErrorMessage("スニペットの更新に失敗しました。");
+    }
+  }
+
+  // ▼▼▼【ここから追加】▼▼▼
+  private handleUpdateOrder(data: { snippets: Snippet[]; groups: Group[] }) {
+    try {
+      if (data.snippets && data.groups) {
+        this.writeJsonFile(this.snippetsFile, data.snippets);
+        this.writeJsonFile(this.groupsFile, data.groups);
+        console.log("順序の保存に成功しました");
+      } else {
+        console.error("順序の保存データが不正です", data);
+      }
+    } catch (error) {
+      console.error("順序の保存に失敗しました", error);
+      vscode.window.showErrorMessage("順序の保存に失敗しました。");
     }
   }
   // ▲▲▲【ここまで追加】▲▲▲

@@ -26,7 +26,6 @@
   border-radius: 5px;
 }
 
-/* ▼▼▼【ここから修正】▼▼▼ */
 
 /* 各入力項目（ラベル、入力欄、エラーメッセージ）をまとめるグループ */
 .form-group {
@@ -39,8 +38,6 @@
   /* margin-bottom: 0.5em; ← この行を削除します。これにより入力欄とエラーメッセージが近づきます */
 }
 
-/* ▲▲▲【ここまで修正】▲▲▲ */
-
 .form-actions {
   display: flex;
   gap: 0.5em;
@@ -50,32 +47,25 @@
 
 .add-button-container {
   display: flex;
-  align-items: stretch; /* ★ これに変更 */
+  align-items: stretch;
 }
 
 .add-button {
   /* ★ これが主要な変更点。残りの利用可能なスペースをすべて埋める */
   flex-grow: 1;
-  width: auto; /* width: 100% は削除 */
+  width: auto;
 
-  /* 角丸と右の境界線をなくす設定は正しいので維持 */
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
   border-right: none;
-
-  /* テキストが左揃えになるように */
   text-align: left;
 }
 
 .add-dropdown-button {
-  /* height: 100% は不要なので削除 */
   height: auto;
   
-  /* 角丸の設定は正しいので維持 */
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
-
-  /* ★ 区切り線の色を、よりボタンの境界線らしい色に調整 */
   border-left: 1px solid var(--vscode-button-border, var(--vscode-input-border));
 }
 
@@ -109,8 +99,6 @@
 
   font-size: 1em;
   font-family: inherit;
-
-  /* focus 時のハイライトも VSCode 風に */
   outline: none;
 }
 
@@ -122,10 +110,8 @@
 .command-input-container {
   display: flex;
   align-items: center;
-/* ▼▼▼【ここを修正】▼▼▼ */
   margin-bottom: 4px; /* コマンド入力欄が複数ある場合の間隔を少し調整 */
   margin-top: 0;
-/* ▲▲▲【ここまで修正】▲▲▲ */
   width: 100%;
 }
 
@@ -153,7 +139,6 @@
   margin-top: 4px;
 }
 
-/* ▼▼▼【ここから追加】▼▼▼ */
 .search-bar-container {
   margin-top: 8px; /* ボタンとの間隔を空ける */
   margin-bottom: 8px;
@@ -162,7 +147,23 @@
 .search-input {
   width: 100%;
   box-sizing: border-box; /* paddingを含めてwidthを100%に保つ */
-  /* ▼▼▼【ここから修正】▼▼▼ */
   border-radius: 4px; /* 角を少し丸める */
 }
-/* ▲▲▲【ここまで追加】▲▲▲ */
+
+.drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+  color: var(--vscode-foreground);
+  opacity: 0.6;
+}
+
+.drag-handle:hover {
+  opacity: 1;
+}
+
+.group-header {
+  display: flex;
+  align-items: center;
+}
