@@ -1,16 +1,4 @@
-.snippet-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5em;
-}
-
-/* スニペット名を表示するボタン */
-.snippet-name-button {
-  flex-grow: 1;
-  text-align: left;
-}
-
+/* スニペットリスト全体のコンテナ */
 .snippet-list {
   display: flex;
   flex-direction: column;
@@ -18,57 +6,38 @@
   margin-bottom: 1em;
 }
 
-/* 新規登録フォームのコンテナ */
-.form-container {
-  margin-top: 1em;
-  border: 1px solid var(--vscode-input-border); /* VSCodeのテーマに合わせる */
-  padding: 1em;
-  border-radius: 5px;
+/* 検索バーのコンテナ */
+.search-bar-container {
+  margin-top: 8px;
+  margin-bottom: 8px;
 }
 
 
-/* 各入力項目（ラベル、入力欄、エラーメッセージ）をまとめるグループ */
-.form-group {
-  margin-bottom: 0.8em; /* グループ間の余白をここで管理します */
-}
-
-.form-textfield {
-  display: block;
-  width: 100%;
-  /* margin-bottom: 0.5em; ← この行を削除します。これにより入力欄とエラーメッセージが近づきます */
-}
-
-.form-actions {
-  display: flex;
-  gap: 0.5em;
-  margin-top: 2px;
-  justify-content: flex-end;
-}
-
+/* スニペット追加ボタンとドロップダウンのコンテナ */
 .add-button-container {
   display: flex;
   align-items: stretch;
 }
 
+/* 「スニペットを追加する」ボタン本体 */
 .add-button {
-  /* ★ これが主要な変更点。残りの利用可能なスペースをすべて埋める */
-  flex-grow: 1;
+  flex-grow: 1; /* 残りのスペースを埋める */
   width: auto;
-
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
   border-right: none;
   text-align: left;
 }
 
+/* ドロップダウンを開くボタン */
 .add-dropdown-button {
   height: auto;
-  
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   border-left: 1px solid var(--vscode-button-border, var(--vscode-input-border));
 }
 
+/* ドロップダウンメニュー本体 */
 .add-dropdown-menu {
   position: absolute;
   top: 100%;
@@ -85,32 +54,94 @@
   border-radius: 3px;
 }
 
+
+/* スニペット一行全体のコンテナ */
+.snippet-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5em;
+}
+
+/* スニペット名を表示するボタン */
+.snippet-name-button {
+  flex-grow: 1; /* スペースを埋めて右端にメニューを配置 */
+  text-align: left;
+}
+
+/* グループのヘッダー */
+.group-header {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+/* グループ名 */
+.group-header .group-name {
+  flex-grow: 1; /* スペースを埋めて右端にメニューを配置 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* 長い名前は省略 */
+}
+
+/* グループのミートボールメニューコンテナ */
+.group-header .meatball-menu-container {
+  flex-shrink: 0; /* 縮まないように設定 */
+}
+
+
+/* フォーム全体のコンテナ */
+.form-container {
+  margin-top: 1em;
+  border: 1px solid var(--vscode-input-border);
+  padding: 1em;
+  border-radius: 5px;
+}
+
+/* ラベル、入力欄、エラーをまとめるグループ */
+.form-group {
+  margin-bottom: 0.8em;
+}
+
+/* テキスト入力欄 */
+.form-textfield {
+  display: block;
+  width: 100%;
+}
+
+/* 検索バーの入力欄 */
+.search-input {
+  width: 100%;
+  box-sizing: border-box; /* paddingを含めてwidthを100%に */
+  border-radius: 4px;
+}
+
+/* グループ選択のセレクトボックス */
 .form-select {
   display: block;
   width: 100%;
   margin-bottom: 0.5em;
-
-  /* VSCodeテーマに馴染ませるための基本設定 */
   background-color: var(--vscode-input-background);
   color: var(--vscode-input-foreground);
   border: 1px solid var(--vscode-input-border);
   border-radius: 2px;
   padding: 0.4em;
-
   font-size: 1em;
   font-family: inherit;
   outline: none;
 }
 
+/* セレクトボックスがフォーカスされた時のスタイル */
 .form-select:focus {
   border-color: var(--vscode-focusBorder);
   box-shadow: 0 0 0 1px var(--vscode-focusBorder);
 }
 
+/* 複数コマンド入力のコンテナ */
 .command-input-container {
   display: flex;
   align-items: center;
-  margin-bottom: 4px; /* コマンド入力欄が複数ある場合の間隔を少し調整 */
+  margin-bottom: 4px;
   margin-top: 0;
   width: 100%;
 }
@@ -119,6 +150,7 @@
   flex-grow: 1;
 }
 
+/* コマンド削除ボタン */
 .remove-command-button {
   margin-left: 5px;
   min-width: 20px;
@@ -127,29 +159,27 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  /* 2. ボタンを赤い枠線で囲む */
   border: 1px solid var(--vscode-errorForeground);
-  /* 3. ボタンを円形にする */
   border-radius: 50%;
 }
 
+/* フォームの登録・更新ボタンのコンテナ */
+.form-actions {
+  display: flex;
+  gap: 0.5em;
+  margin-top: 2px;
+  justify-content: flex-end;
+}
+
+/* バリデーションエラーメッセージ */
 .error-message {
   color: var(--vscode-errorForeground);
   font-size: 12px;
   margin-top: 4px;
 }
 
-.search-bar-container {
-  margin-top: 8px; /* ボタンとの間隔を空ける */
-  margin-bottom: 8px;
-}
 
-.search-input {
-  width: 100%;
-  box-sizing: border-box; /* paddingを含めてwidthを100%に保つ */
-  border-radius: 4px; /* 角を少し丸める */
-}
-
+/* ドラッグハンドル */
 .drag-handle {
   display: inline-flex;
   align-items: center;
@@ -157,13 +187,9 @@
   margin-right: 8px;
   color: var(--vscode-foreground);
   opacity: 0.6;
+  cursor: grab; /* カーソルを掴む形に変更 */
 }
 
 .drag-handle:hover {
   opacity: 1;
-}
-
-.group-header {
-  display: flex;
-  align-items: center;
 }

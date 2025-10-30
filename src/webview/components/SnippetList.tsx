@@ -2,17 +2,13 @@ import React, { useState } from "react";
 import { Snippet, Group } from "../types";
 import MeatballMenu from "./meatball/MeatballMenu";
 import Button from "./common/Button";
-// ▼▼▼【ここから追加】▼▼▼
-import { useSortable, defaultAnimateLayoutChanges } from "@dnd-kit/sortable";
+import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { SortableContext, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import DragHandleIcon from "../../icons/DragHandleIcon";
-// ▲▲▲【ここまで追加】▲▲▲
 
-// ▼▼▼【ここから修正】▼▼▼
 // main.tsxでインポートするためにexportする
 export const AccordionIcon = ({ isOpen }: { isOpen: boolean }) => (
-// ▲▲▲【ここまで修正】▲▲▲
   <span
     style={{
       display: "inline-block",
@@ -31,35 +27,27 @@ interface SnippetItemProps {
   onEditSnippet: (snippet: Snippet, groupId?: string) => void;
   onDeleteSnippet: (id: string) => void;
   groupId?: string;
-  // ▼▼▼【ここから追加】▼▼▼
   // dnd-kitのリスナーと属性をpropsとして受け取る
   dragAttributes?: ReturnType<typeof useSortable>["attributes"];
   dragListeners?: ReturnType<typeof useSortable>["listeners"];
-  // ▲▲▲【ここまで追加】▲▲▲
 }
 
-// ▼▼▼【ここから修正】▼▼▼
 // main.tsxでインポートするためにexportする
 export const SnippetItem: React.FC<SnippetItemProps> = ({
-// ▲▲▲【ここまで修正】▲▲▲
   snippet,
   onRunSnippet,
   onEditSnippet,
   onDeleteSnippet,
   groupId,
-  // ▼▼▼【ここから追加】▼▼▼
   dragAttributes,
   dragListeners,
-  // ▲▲▲【ここまで追加】▲▲▲
 }) => (
-  // ▼▼▼【ここから修正】▼▼▼
   <div className="snippet-item">
     <DragHandleIcon
       className="drag-handle"
       {...dragAttributes}
       {...dragListeners}
     />
-    {/* ▲▲▲【ここまで修正】▲▲▲ */}
     <Button
       appearance="secondary"
       className="snippet-name-button"
@@ -78,7 +66,6 @@ export const SnippetItem: React.FC<SnippetItemProps> = ({
   </div>
 );
 
-// ▼▼▼【ここから修正】▼▼▼
 // propsからdrag関連の型を除外
 const SortableSnippetItem: React.FC<
   Omit<SnippetItemProps, "dragAttributes" | "dragListeners">
@@ -96,10 +83,8 @@ const SortableSnippetItem: React.FC<
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    // ▼▼▼【ここから追加】▼▼▼
     // ドラッグ中は半透明にする
     opacity: isDragging ? 0.5 : 1,
-    // ▲▲▲【ここまで追加】▲▲▲
   };
 
   return (
@@ -113,7 +98,6 @@ const SortableSnippetItem: React.FC<
     </div>
   );
 };
-// ▲▲▲【ここまで修正】▲▲▲
 
 
 interface SnippetListProps {
@@ -122,6 +106,10 @@ interface SnippetListProps {
   onRunSnippet: (snippet: Snippet) => void;
   onEditSnippet: (snippet: Snippet, groupId?: string) => void;
   onDeleteSnippet: (id: string) => void;
+  // ▼▼▼【ここから追加】▼▼▼
+  onEditGroup: (group: Group) => void;
+  onDeleteGroup: (groupId: string) => void;
+  // ▲▲▲【ここまで追加】▲▲▲
 }
 
 const SnippetList: React.FC<SnippetListProps> = ({
@@ -130,6 +118,10 @@ const SnippetList: React.FC<SnippetListProps> = ({
   onRunSnippet,
   onEditSnippet,
   onDeleteSnippet,
+  // ▼▼▼【ここから追加】▼▼▼
+  onEditGroup,
+  onDeleteGroup,
+  // ▲▲▲【ここまで追加】▲▲▲
 }) => {
   const [openGroups, setOpenGroups] = useState<Record<string, boolean>>({});
 
@@ -144,7 +136,6 @@ const SnippetList: React.FC<SnippetListProps> = ({
   return (
     <div className="snippet-list">
       {/* --- グループのレンダリング --- */}
-      {/* ▼▼▼【ここから修正】▼▼▼ */}
       <SortableContext items={groups.map((g) => g.id)} strategy={verticalListSortingStrategy}>
         {groups.map((group) => (
           <SortableGroup
@@ -155,13 +146,15 @@ const SnippetList: React.FC<SnippetListProps> = ({
             onRunSnippet={onRunSnippet}
             onEditSnippet={onEditSnippet}
             onDeleteSnippet={onDeleteSnippet}
+            // ▼▼▼【ここから追加】▼▼▼
+            onEditGroup={onEditGroup}
+            onDeleteGroup={onDeleteGroup}
+            // ▲▲▲【ここまで追加】▲▲▲
           />
         ))}
       </SortableContext>
-      {/* ▲▲▲【ここまで修正】▲▲▲ */}
 
       {/* --- グループ化されていないスニペットのレンダリング --- */}
-      {/* ▼▼▼【ここから修正】▼▼▼ */}
       <SortableContext items={snippets.map((s) => s.id)} strategy={verticalListSortingStrategy}>
         {snippets.map((snippet) => (
           <SortableSnippetItem
@@ -173,12 +166,10 @@ const SnippetList: React.FC<SnippetListProps> = ({
           />
         ))}
       </SortableContext>
-      {/* ▲▲▲【ここまで修正】▲▲▲ */}
     </div>
   );
 };
 
-// ▼▼▼【ここから追加】▼▼▼
 // グループをDraggableにするためのコンポーネント
 interface SortableGroupProps {
   group: Group;
@@ -187,6 +178,10 @@ interface SortableGroupProps {
   onRunSnippet: (snippet: Snippet) => void;
   onEditSnippet: (snippet: Snippet, groupId?: string) => void;
   onDeleteSnippet: (id: string) => void;
+  // ▼▼▼【ここから追加】▼▼▼
+  onEditGroup: (group: Group) => void;
+  onDeleteGroup: (groupId: string) => void;
+  // ▲▲▲【ここまで追加】▲▲▲
 }
 
 const SortableGroup: React.FC<SortableGroupProps> = ({
@@ -196,6 +191,10 @@ const SortableGroup: React.FC<SortableGroupProps> = ({
   onRunSnippet,
   onEditSnippet,
   onDeleteSnippet,
+  // ▼▼▼【ここから追加】▼▼▼
+  onEditGroup,
+  onDeleteGroup,
+  // ▲▲▲【ここまで追加】▲▲▲
 }) => {
   const {
     attributes,
@@ -214,15 +213,12 @@ const SortableGroup: React.FC<SortableGroupProps> = ({
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    // ▼▼▼【ここから追加】▼▼▼
     // ドラッグ中は半透明にする
     opacity: isDragging ? 0.5 : 1,
-    // ▲▲▲【ここまで追加】▲▲▲
   };
 
   return (
     <div ref={setNodeRef} style={style} className="group-container">
-      {/* ▼▼▼【ここから修正】▼▼▼ */}
       {/* onClickはヘッダー全体に残し、ドラッグリスナーはハンドルに限定 */}
       <div className="group-header" onClick={() => onToggle(group.id)}>
         <DragHandleIcon
@@ -233,8 +229,18 @@ const SortableGroup: React.FC<SortableGroupProps> = ({
         />
         <AccordionIcon isOpen={isOpen} />
         <span className="group-name">{group.groupName}</span>
+        {/* ▼▼▼【ここから追加】▼▼▼ */}
+        <div className="meatball-menu-container" onClick={(e) => e.stopPropagation()}>
+          <MeatballMenu
+            id={`meatball-menu-group-${group.id}`}
+            menuItems={[
+              { label: "編集", onClick: () => onEditGroup(group) },
+              { label: "削除", onClick: () => onDeleteGroup(group.id) },
+            ]}
+          />
+        </div>
+        {/* ▲▲▲【ここまで追加】▲▲▲ */}
       </div>
-      {/* ▲▲▲【ここまで修正】▲▲▲ */}
       {isOpen && (
         <div className="group-snippets">
           {/* グループ内スニペットをSortableにする */}
@@ -261,6 +267,5 @@ const SortableGroup: React.FC<SortableGroupProps> = ({
     </div>
   );
 };
-// ▲▲▲【ここまで追加】▲▲▲
 
 export default SnippetList;

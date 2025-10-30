@@ -9,7 +9,6 @@ import { Snippet, Group } from "./types";
 import { Button, Option, TextField } from "./components/common";
 import "./styles.css";
 import ChevronDownIcon from "../icons/ChevronDownIcon";
-// ▼▼▼【ここから追加】▼▼▼
 import {
   DndContext,
   closestCenter,
@@ -29,7 +28,6 @@ import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 // SnippetList から SnippetItem と AccordionIcon をインポート
 import { SnippetItem, AccordionIcon } from "./components/SnippetList";
 import DragHandleIcon from "../icons/DragHandleIcon";
-// ▲▲▲【ここまで追加】▲▲▲
 
 const App: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
@@ -37,7 +35,7 @@ const App: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
-  // ▼▼▼【ここを修正】▼▼▼
+
   const {
     snippets,
     groups,
@@ -49,17 +47,23 @@ const App: React.FC = () => {
     runSnippet,
     updateSnippet,
     updateOrder, // hooksから関数を受け取る
+    // ▼▼▼【ここから追加】▼▼▼
+    updateGroup,
+    deleteGroup,
+    // ▲▲▲【ここまで追加】▲▲▲
   } = useSnippets();
-  // ▲▲▲【ここまで修正】▲▲▲
+
   const [editingContext, setEditingContext] = useState<{
     snippet: Snippet;
     groupId?: string;
   } | null>(null);
 
   // ▼▼▼【ここから追加】▼▼▼
+  const [editingGroup, setEditingGroup] = useState<Group | null>(null);
+  // ▲▲▲【ここまで追加】▲▲▲
+
   // ドラッグ中のアイテムを保持するstate
   const [activeItem, setActiveItem] = useState<Snippet | Group | null>(null);
-  // ▲▲▲【ここまで追加】▲▲▲
 
   const filteredData = useMemo(() => {
     if (!searchTerm.trim()) {
@@ -90,7 +94,6 @@ const App: React.FC = () => {
     return { filteredSnippets, filteredGroups };
   }, [searchTerm, snippets, groups]);
 
-  // ▼▼▼【ここから追加】▼▼▼
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -180,7 +183,6 @@ const App: React.FC = () => {
     setSnippets(newSnippets);
     updateOrder(newSnippets, newGroups); // 変更をバックエンドに通知
   };
-  // ▲▲▲【ここまで追加】▲▲▲
 
   const handleDropdownToggle = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -230,10 +232,31 @@ const App: React.FC = () => {
     setEditingContext(null);
   };
 
+  // ▼▼▼【ここから追加】▼▼▼
+  const handleEditGroup = (group: Group) => {
+    setEditingGroup(group);
+    setShowGroupForm(true);
+  };
+
+  const handleUpdateGroup = (group: Group) => {
+    updateGroup(group);
+    setEditingGroup(null);
+    setShowGroupForm(false);
+  };
+
+  const handleDeleteGroup = (groupId: string) => {
+    // ユーザーに確認を求める場合は、ここに confirm ダイアログなどを追加できます。
+    deleteGroup(groupId);
+  };
+  // ▲▲▲【ここまで追加】▲▲▲
+
   const handleCancelForm = () => {
     setShowForm(false);
     setShowGroupForm(false);
     setEditingContext(null);
+    // ▼▼▼【ここから追加】▼▼▼
+    setEditingGroup(null);
+    // ▲▲▲【ここまで追加】▲▲▲
   };
 
   return (
@@ -282,8 +305,8 @@ const App: React.FC = () => {
         collisionDetection={closestCenter}
         onDragStart={handleDragStart}
         onDragEnd={handleDragEnd}
-        onDragCancel={() => setActiveItem(null)} // キャンセル時もリセット
-        modifiers={[restrictToVerticalAxis]} // 縦方向のみに移動を制限
+        onDragCancel={() => setActiveItem(null)}
+        modifiers={[restrictToVerticalAxis]}
       >
         <SnippetList
           groups={filteredData.filteredGroups}
@@ -291,12 +314,12 @@ const App: React.FC = () => {
           onRunSnippet={runSnippet}
           onEditSnippet={handleEditSnippet}
           onDeleteSnippet={handleDeleteSnippet}
+          onEditGroup={handleEditGroup}
+          onDeleteGroup={handleDeleteGroup}
         />
         <DragOverlay>
           {activeItem ? (
-            // activeItemがGroupかSnippetかを判別して表示を切り替え
             "groupName" in activeItem ? (
-              // グループのオーバーレイ
               <div
                 className="group-header"
                 style={{
@@ -311,7 +334,6 @@ const App: React.FC = () => {
                 </span>
               </div>
             ) : (
-              // スニペットのオーバーレイ
               <div style={{ opacity: 0.9 }}>
                 <SnippetItem
                   snippet={activeItem as Snippet}
@@ -336,9 +358,16 @@ const App: React.FC = () => {
         />
       )}
 
+      {/* ▼▼▼【ここから修正】▼▼▼ */}
       {showGroupForm && (
-        <GroupForm onSubmit={handleAddGroup} onCancel={handleCancelForm} />
+        <GroupForm
+          onSubmit={handleAddGroup}
+          onUpdate={handleUpdateGroup}
+          onCancel={handleCancelForm}
+          editingGroup={editingGroup}
+        />
       )}
+      {/* ▲▲▲【ここまで修正】▲▲▲ */}
     </MeatballMenuProvider>
   );
 };
