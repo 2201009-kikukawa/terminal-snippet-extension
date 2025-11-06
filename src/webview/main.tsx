@@ -4,7 +4,6 @@ import { useSnippets } from "./hooks";
 import SnippetList from "./components/SnippetList";
 import SnippetForm from "./components/SnippetForm";
 import GroupForm from "./components/GroupForm";
-import { MeatballMenuProvider } from "./components/meatball/MeatballMenuContext";
 import { Snippet, Group } from "./types";
 import { Button, Option, TextField } from "./components/common";
 import "./styles.css";
@@ -44,10 +43,8 @@ const App: React.FC = () => {
     runSnippet,
     updateSnippet,
     updateOrder, // hooksから関数を受け取る
-    // ▼▼▼【ここから追加】▼▼▼
     updateGroup,
     deleteGroup,
-    // ▲▲▲【ここまで追加】▲▲▲
   } = useSnippets();
 
   const [editingContext, setEditingContext] = useState<{
@@ -55,9 +52,7 @@ const App: React.FC = () => {
     groupId?: string;
   } | null>(null);
 
-  // ▼▼▼【ここから追加】▼▼▼
   const [editingGroup, setEditingGroup] = useState<Group | null>(null);
-  // ▲▲▲【ここまで追加】▲▲▲
 
   // ドラッグ中のアイテムを保持するstate
   const [activeItem, setActiveItem] = useState<Snippet | Group | null>(null);
@@ -214,6 +209,12 @@ const App: React.FC = () => {
   };
 
   const handleDeleteSnippet = (id: string) => {
+    // ▼▼▼【ここから追加】▼▼▼
+    // もし削除対象が編集中のスニペットなら、編集フォームを閉じる
+    if (editingContext && editingContext.snippet.id === id) {
+      setEditingContext(null);
+    }
+    // ▲▲▲【ここまで追加】▲▲▲
     deleteSnippet(id);
   };
 
@@ -226,7 +227,6 @@ const App: React.FC = () => {
     setEditingContext(null);
   };
 
-  // ▼▼▼【ここから追加】▼▼▼
   const handleEditGroup = (group: Group) => {
     setEditingGroup(group);
     setShowGroupForm(true);
@@ -240,21 +240,25 @@ const App: React.FC = () => {
 
   const handleDeleteGroup = (groupId: string) => {
     // ユーザーに確認を求める場合は、ここに confirm ダイアログなどを追加できます。
+    // ▼▼▼【ここから追加】▼▼▼
+    // もし削除対象が編集中のグループなら、編集フォームを閉じる
+    if (editingGroup && editingGroup.id === groupId) {
+      setEditingGroup(null);
+      setShowGroupForm(false);
+    }
+    // ▲▲▲【ここまで追加】▲▲▲
     deleteGroup(groupId);
   };
-  // ▲▲▲【ここまで追加】▲▲▲
 
   const handleCancelForm = () => {
     setShowForm(false);
     setShowGroupForm(false);
     setEditingContext(null);
-    // ▼▼▼【ここから追加】▼▼▼
     setEditingGroup(null);
-    // ▲▲▲【ここまで追加】▲▲▲
   };
 
   return (
-    <MeatballMenuProvider>
+    <div>
       <div style={{ position: "relative" }} ref={dropdownRef}>
         <div className="add-button-container">
           <Button className="add-button" onClick={() => setShowForm(true)}>
@@ -287,7 +291,6 @@ const App: React.FC = () => {
         />
       </div>
 
-      {/* ▼▼▼【ここから修正】▼▼▼ */}
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -325,13 +328,16 @@ const App: React.FC = () => {
                   onRunSnippet={() => {}}
                   onEditSnippet={() => {}}
                   onDeleteSnippet={() => {}}
+                  // ▼▼▼【ここから追加】▼▼▼
+                  isMenuOpen={false}
+                  onMenuToggle={() => {}}
+                  // ▲▲▲【ここまで追加】▲▲▲
                 />
               </div>
             )
           ) : null}
         </DragOverlay>
       </DndContext>
-      {/* ▲▲▲【ここまで修正】▲▲▲ */}
 
       {(showForm || editingContext) && !showGroupForm && (
         <SnippetForm
@@ -343,7 +349,6 @@ const App: React.FC = () => {
         />
       )}
 
-      {/* ▼▼▼【ここから修正】▼▼▼ */}
       {showGroupForm && (
         <GroupForm
           onSubmit={handleAddGroup}
@@ -352,8 +357,7 @@ const App: React.FC = () => {
           editingGroup={editingGroup}
         />
       )}
-      {/* ▲▲▲【ここまで修正】▲▲▲ */}
-    </MeatballMenuProvider>
+    </div>
   );
 };
 

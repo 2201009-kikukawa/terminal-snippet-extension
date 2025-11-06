@@ -193,3 +193,56 @@
 .drag-handle:hover {
   opacity: 1;
 }
+
+/* 通常時はドラッグハンドルを非表示に設定 */
+.snippet-item .drag-handle,
+.group-header .drag-handle {
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+}
+
+/* 項目にホバーした際にドラッグハンドルを表示 */
+.snippet-item:hover .drag-handle,
+.group-header:hover .drag-handle {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* === ▼▼▼ ここから追加 ▼▼▼ === */
+
+/* ドラッグハンドルとコンテキストメニューのコンテナ */
+.drag-handle-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+/* コンテキストメニューのスタイル */
+.context-menu {
+  position: absolute;
+  top: 100%; /* ハンドルの真下に表示 */
+  left: 0;
+  z-index: 10;
+  background-color: var(--vscode-dropdown-background);
+  border: 1px solid var(--vscode-dropdown-border);
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  padding: 4px;
+  min-width: 80px; /* メニューの最小幅 */
+}
+
+/* コンテキストメニューの各項目のスタイル */
+.context-menu-item {
+  padding: 6px 12px;
+  cursor: pointer;
+  color: var(--vscode-foreground);
+  text-align: center;
+}
+
+/* メニュー項目にホバーした時のスタイル */
+.context-menu-item:hover {
+  background-color: var(--vscode-list-hoverBackground);
+}
+
+/* === ▲▲▲ ここまで追加 ▲▲▲ === */
