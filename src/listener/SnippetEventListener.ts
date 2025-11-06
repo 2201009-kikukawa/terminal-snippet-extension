@@ -62,9 +62,21 @@ export class SnippetEventListener {
           this.handleDeleteSnippet(message.value, webviewView);
           break;
 
-        // ▼▼▼【ここから追加】▼▼▼
         case EventTypes.UpdateSnippet:
           this.handleUpdateSnippet(message.value, webviewView);
+          break;
+
+        case EventTypes.UpdateOrder:
+          this.handleUpdateOrder(message.value);
+          break;
+
+        // ▼▼▼【ここから追加】▼▼▼
+        case EventTypes.UpdateGroup:
+          this.handleUpdateGroup(message.value, webviewView);
+          break;
+
+        case EventTypes.DeleteGroup:
+          this.handleDeleteGroup(message.value, webviewView);
           break;
         // ▲▲▲【ここまで追加】▲▲▲
       }
@@ -262,7 +274,6 @@ export class SnippetEventListener {
     }
   }
 
-  // ▼▼▼【ここから追加】▼▼▼
   private handleUpdateSnippet(
     data: { snippet: Snippet; groupId?: string },
     webviewView: WebviewView
@@ -305,6 +316,64 @@ export class SnippetEventListener {
     } catch (error) {
       console.error("スニペットの更新に失敗しました", error);
       vscode.window.showErrorMessage("スニペットの更新に失敗しました。");
+    }
+  }
+
+  private handleUpdateOrder(data: { snippets: Snippet[]; groups: Group[] }) {
+    try {
+      if (data.snippets && data.groups) {
+        this.writeJsonFile(this.snippetsFile, data.snippets);
+        this.writeJsonFile(this.groupsFile, data.groups);
+        console.log("順序の保存に成功しました");
+      } else {
+        console.error("順序の保存データが不正です", data);
+      }
+    } catch (error) {
+      console.error("順序の保存に失敗しました", error);
+      vscode.window.showErrorMessage("順序の保存に失敗しました。");
+    }
+  }
+
+  // ▼▼▼【ここから追加】▼▼▼
+  private handleUpdateGroup(updatedGroup: Group, webviewView: WebviewView) {
+    try {
+      const currentGroups = this.readJsonFile<Group[]>(this.groupsFile, []);
+      const groupIndex = currentGroups.findIndex((g) => g.id === updatedGroup.id);
+
+      if (groupIndex > -1) {
+        // グループ名のみを更新
+        currentGroups[groupIndex].groupName = updatedGroup.groupName;
+        this.writeJsonFile(this.groupsFile, currentGroups);
+        console.log("グループを更新しました");
+        // 更新後のグループリストをWebviewに送信
+        this.handleGetGroups(webviewView);
+      } else {
+        console.error(`更新対象のグループが見つかりません: ID=${updatedGroup.id}`);
+        vscode.window.showErrorMessage("グループの更新に失敗しました。");
+      }
+    } catch (error) {
+      console.error("グループの更新に失敗しました", error);
+      vscode.window.showErrorMessage("グループの更新に失敗しました。");
+    }
+  }
+
+  private handleDeleteGroup(groupId: string, webviewView: WebviewView) {
+    try {
+      const currentGroups = this.readJsonFile<Group[]>(this.groupsFile, []);
+      const updatedGroups = currentGroups.filter((g) => g.id !== groupId);
+
+      // 削除が成功したか（配列の長さが変わったか）を確認
+      if (updatedGroups.length < currentGroups.length) {
+        this.writeJsonFile(this.groupsFile, updatedGroups);
+        console.log("グループを削除しました");
+        // 更新後のグループリストをWebviewに送信
+        this.handleGetGroups(webviewView);
+      } else {
+        console.warn(`削除対象のグループが見つかりませんでした: ID=${groupId}`);
+      }
+    } catch (error) {
+      console.error("グループの削除中にエラーが発生しました", error);
+      vscode.window.showErrorMessage("グループの削除に失敗しました。");
     }
   }
   // ▲▲▲【ここまで追加】▲▲▲

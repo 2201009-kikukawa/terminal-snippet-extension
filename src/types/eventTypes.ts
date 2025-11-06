@@ -5,9 +5,12 @@ export enum EventTypes {
   GetGroups = "getGroups",
   RunSnippet = "runSnippet",
   DeleteSnippet = "deleteSnippet",
-  // ▼▼▼【ここから修正】▼▼▼
   UpdateSnippet = "updateSnippet",
-  // ▲▲▲【ここまで修正】▲▲▲
+  UpdateOrder = "updateOrder",
+  // ▼▼▼【ここから追加】▼▼▼
+  UpdateGroup = "updateGroup",
+  DeleteGroup = "deleteGroup",
+  // ▲▲▲【ここまで追加】▲▲▲
   SnippetsData = "snippetsData",
   GroupsData = "groupsData",
 }

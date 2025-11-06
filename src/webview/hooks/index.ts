@@ -60,16 +60,50 @@ export const useSnippets = () => {
     });
   };
 
-    // ▼▼▼【ここから追加】▼▼▼
   const updateSnippet = (snippet: Snippet, groupId?: string) => {
     vscode.postMessage({
       type: EventTypes.UpdateSnippet,
       value: { snippet, groupId },
     });
   };
+
+  const updateOrder = (snippets: Snippet[], groups: Group[]) => {
+    vscode.postMessage({
+      type: EventTypes.UpdateOrder,
+      value: { snippets, groups },
+    });
+  };
+
+  // ▼▼▼【ここから追加】▼▼▼
+  const updateGroup = (group: Group) => {
+    vscode.postMessage({
+      type: EventTypes.UpdateGroup,
+      value: group,
+    });
+  };
+
+  const deleteGroup = (groupId: string) => {
+    vscode.postMessage({
+      type: EventTypes.DeleteGroup,
+      value: groupId,
+    });
+  };
   // ▲▲▲【ここまで追加】▲▲▲
-  
-  // ▼▼▼【ここを修正】▼▼▼
-  return { snippets, groups, addSnippet, addGroup, deleteSnippet, runSnippet, updateSnippet };
+
+  // ▼▼▼【ここから修正】▼▼▼
+  return {
+    snippets,
+    groups,
+    setSnippets,
+    setGroups,
+    addSnippet,
+    addGroup,
+    deleteSnippet,
+    runSnippet,
+    updateSnippet,
+    updateOrder,
+    updateGroup,
+    deleteGroup,
+  };
   // ▲▲▲【ここまで修正】▲▲▲
 };
