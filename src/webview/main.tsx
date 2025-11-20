@@ -25,6 +25,15 @@ import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { SnippetItem, AccordionIcon } from "./components/SnippetList";
 import DragHandleIcon from "../icons/DragHandleIcon";
 
+// ▼▼▼【ここから追加】Dialog関連のコンポーネントをインポート ▼▼▼
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "./components/ui/dialog";
+// ▲▲▲【ここまで追加】▲▲▲
+
 const App: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [showGroupForm, setShowGroupForm] = useState(false);
@@ -209,12 +218,10 @@ const App: React.FC = () => {
   };
 
   const handleDeleteSnippet = (id: string) => {
-    // ▼▼▼【ここから追加】▼▼▼
     // もし削除対象が編集中のスニペットなら、編集フォームを閉じる
     if (editingContext && editingContext.snippet.id === id) {
       setEditingContext(null);
     }
-    // ▲▲▲【ここまで追加】▲▲▲
     deleteSnippet(id);
   };
 
@@ -239,14 +246,11 @@ const App: React.FC = () => {
   };
 
   const handleDeleteGroup = (groupId: string) => {
-    // ユーザーに確認を求める場合は、ここに confirm ダイアログなどを追加できます。
-    // ▼▼▼【ここから追加】▼▼▼
     // もし削除対象が編集中のグループなら、編集フォームを閉じる
     if (editingGroup && editingGroup.id === groupId) {
       setEditingGroup(null);
       setShowGroupForm(false);
     }
-    // ▲▲▲【ここまで追加】▲▲▲
     deleteGroup(groupId);
   };
 
@@ -256,6 +260,26 @@ const App: React.FC = () => {
     setEditingContext(null);
     setEditingGroup(null);
   };
+
+  // ▼▼▼ 追加: ダイアログの状態管理とタイトルの算出 ▼▼▼
+  const isDialogOpen = showForm || showGroupForm || !!editingContext || !!editingGroup;
+
+  const handleDialogOpenChange = (open: boolean) => {
+    if (!open) {
+      handleCancelForm();
+    }
+  };
+
+  const getDialogTitle = () => {
+    if (showGroupForm || editingGroup) {
+      return editingGroup ? "グループ編集" : "新規グループ作成";
+    }
+    if (showForm || editingContext) {
+      return editingContext ? "編集フォーム" : "新規登録フォーム";
+    }
+    return "";
+  };
+  // ▲▲▲ 追加ここまで ▲▲▲
 
   return (
     <div>
@@ -339,24 +363,36 @@ const App: React.FC = () => {
         </DragOverlay>
       </DndContext>
 
-      {(showForm || editingContext) && !showGroupForm && (
-        <SnippetForm
-          onSubmit={handleAddSnippet}
-          onUpdate={handleUpdateSnippet}
-          onCancel={handleCancelForm}
-          groups={groups}
-          editingContext={editingContext}
-        />
-      )}
+      {/* ▼▼▼ 変更: フォームをDialogでラップ ▼▼▼ */}
+      <Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{getDialogTitle()}</DialogTitle>
+          </DialogHeader>
 
-      {showGroupForm && (
-        <GroupForm
-          onSubmit={handleAddGroup}
-          onUpdate={handleUpdateGroup}
-          onCancel={handleCancelForm}
-          editingGroup={editingGroup}
-        />
-      )}
+          {/* スニペット用フォーム */}
+          {(showForm || editingContext) && !showGroupForm && (
+            <SnippetForm
+              onSubmit={handleAddSnippet}
+              onUpdate={handleUpdateSnippet}
+              onCancel={handleCancelForm}
+              groups={groups}
+              editingContext={editingContext}
+            />
+          )}
+
+          {/* グループ用フォーム */}
+          {showGroupForm && (
+            <GroupForm
+              onSubmit={handleAddGroup}
+              onUpdate={handleUpdateGroup}
+              onCancel={handleCancelForm}
+              editingGroup={editingGroup}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+      {/* ▲▲▲ 変更ここまで ▲▲▲ */}
     </div>
   );
 };
