@@ -22,11 +22,8 @@ const SnippetForm: React.FC<SnippetFormProps> = ({
   const [commands, setCommands] = useState<string[]>([""]);
   const [selectedGroupId, setSelectedGroupId] = useState<string>("");
   const [isEdit, setIsEdit] = useState(false);
-
-  // ▼▼▼【ここから追加】▼▼▼
   const [nameError, setNameError] = useState("");
   const [commandError, setCommandError] = useState("");
-  // ▲▲▲【ここまで追加】▲▲▲
 
   const isEditing = !!editingContext;
 
@@ -41,7 +38,6 @@ const SnippetForm: React.FC<SnippetFormProps> = ({
   }, [editingContext, isEditing]);
 
   const handleSubmit = () => {
-    // ▼▼▼【ここから修正】▼▼▼
     // バリデーションエラーをリセット
     setNameError("");
     setCommandError("");
@@ -76,7 +72,6 @@ const SnippetForm: React.FC<SnippetFormProps> = ({
     } else {
       onSubmit(snippetData, selectedGroupId || undefined);
     }
-    // ▲▲▲【ここまで修正】▲▲▲
   };
 
   // ★ コマンド入力欄を追加する関数
@@ -101,9 +96,7 @@ const SnippetForm: React.FC<SnippetFormProps> = ({
   };
 
   return (
-    <div className="form-container">
-      <h3>{isEditing ? "編集フォーム" : "新規登録フォーム"}</h3>
-      {/* ▼▼▼【ここから修正】▼▼▼ */}
+    <div>
       <div className="form-group">
         <label>
           名前
@@ -138,7 +131,6 @@ const SnippetForm: React.FC<SnippetFormProps> = ({
         ))}
         {commandError && <p className="error-message">{commandError}</p>}
       </div>
-      {/* ▲▲▲【ここまで修正】▲▲▲ */}
 
     <div className="form-group">
       <div className="form-check-container" style={{ margin: "2px 0" }}>

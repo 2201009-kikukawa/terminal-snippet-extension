@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { TextField, Button } from "./common";
 import { Group } from "../types"; // ★ typesからGroupをインポート
 
-// ▼▼▼【ここから修正】▼▼▼
 interface GroupFormProps {
   onSubmit: (group: Group) => void;
   onUpdate: (group: Group) => void;
@@ -51,8 +50,7 @@ const GroupForm: React.FC<GroupFormProps> = ({
   };
 
   return (
-    <div className="form-container">
-      <h3>{isEditing ? "グループ編集" : "新規グループ作成"}</h3>
+    <div>
       <div className="form-group">
         <TextField
           value={groupName}
@@ -71,6 +69,5 @@ const GroupForm: React.FC<GroupFormProps> = ({
     </div>
   );
 };
-// ▲▲▲【ここまで修正】▲▲▲
 
 export default GroupForm;

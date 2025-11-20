@@ -1,3 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ▼▼▼【ここから追加】▼▼▼ */
+/* shadcn/ui のためのCSS変数 (VSCodeのテーマに合わせる) */
+:root {
+  --background: var(--vscode-sideBar-background);
+  --foreground: var(--vscode-foreground);
+
+  --card: var(--vscode-input-background);
+  --card-foreground: var(--vscode-input-foreground);
+ 
+  --popover: var(--vscode-menu-background);
+  --popover-foreground: var(--vscode-menu-foreground);
+ 
+  --primary: var(--vscode-button-background);
+  --primary-foreground: var(--vscode-button-foreground);
+ 
+  --secondary: var(--vscode-button-secondaryBackground);
+  --secondary-foreground: var(--vscode-button-secondaryForeground);
+ 
+  --muted: var(--vscode-disabledForeground); /* VSCodeに直接対応するものがないため、近い色を割り当て */
+  --muted-foreground: var(--vscode-disabledForeground);
+ 
+  --accent: var(--vscode-focusBorder); /* フォーカス色をアクセントに */
+  --accent-foreground: var(--vscode-foreground);
+ 
+  --destructive: var(--vscode-errorForeground);
+  --destructive-foreground: var(--vscode-foreground); /* エラー時のテキスト色（適宜調整）*/
+
+  --border: var(--vscode-input-border);
+  --input: var(--vscode-input-border);
+  --ring: var(--vscode-focusBorder);
+ 
+  --radius: 0.5rem;
+}
+/* ▲▲▲ 追加ここまで ▲▲▲ */
+
 /* スニペットリスト全体のコンテナ */
 .snippet-list {
   display: flex;
@@ -209,8 +248,6 @@
   opacity: 1;
 }
 
-/* === ▼▼▼ ここから追加 ▼▼▼ === */
-
 /* ドラッグハンドルとコンテキストメニューのコンテナ */
 .drag-handle-container {
   position: relative;
@@ -244,5 +281,3 @@
 .context-menu-item:hover {
   background-color: var(--vscode-list-hoverBackground);
 }
-
-/* === ▲▲▲ ここまで追加 ▲▲▲ === */
