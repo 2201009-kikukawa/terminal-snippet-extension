@@ -45,6 +45,19 @@
   margin-bottom: 1em;
 }
 
+/* ▼▼▼【修正】グループ内のスニペットを右にずらして階層を表現 ▼▼▼ */
+.group-snippets {
+  /* 左側に20pxの余白を作り、中身を右にずらす */
+  padding-left: 20px; 
+  
+  /* 以下はリストの並びを整えるための設定 */
+  display: flex;
+  flex-direction: column;
+  gap: 4px;      /* スニペット同士の間隔を少し狭めて一体感を出す */
+  margin-top: 4px; /* グループ名との間隔 */
+}
+/* ▲▲▲ 修正ここまで ▲▲▲ */
+
 /* 検索バーのコンテナ */
 .search-bar-container {
   margin-top: 8px;
