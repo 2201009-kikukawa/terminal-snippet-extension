@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ▼▼▼【ここから追加】▼▼▼ */
 /* shadcn/ui のためのCSS変数 (VSCodeのテーマに合わせる) */
 :root {
   --background: var(--vscode-sideBar-background);
@@ -35,7 +34,91 @@
  
   --radius: 0.5rem;
 }
-/* ▲▲▲ 追加ここまで ▲▲▲ */
+
+/* ▼▼▼ 1. 全体のレイアウトと余白の修正 ▼▼▼ */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; 
+}
+
+/* bodyに勝手につくpaddingを打ち消す */
+body[style] {
+  padding-right: 0 !important;
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  
+  /* ★重要: ここでサイドバー全体の「左右の隙間」を作ります */
+  padding: 20px; 
+  box-sizing: border-box; /* paddingを含めたサイズ計算にする */
+}
+
+/* スクロールバーのデザイン調整（前回の内容を維持） */
+#root::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+#root::-webkit-scrollbar-thumb {
+  background-color: var(--vscode-scrollbarSlider-background);
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+#root::-webkit-scrollbar-thumb:hover {
+  background-color: var(--vscode-scrollbarSlider-hoverBackground);
+}
+#root::-webkit-scrollbar-thumb:active {
+  background-color: var(--vscode-scrollbarSlider-activeBackground);
+}
+
+
+/* ▼▼▼ 2. フォーム（ダイアログ）のデザイン修正 ▼▼▼ */
+
+/* フォーム全体のコンテナ */
+.form-container {
+  margin-top: 1em;
+  border: 1px solid var(--vscode-input-border);
+  padding: 1em;
+  border-radius: 5px; /* 既存の設定ですが念のため */
+}
+
+/* テキスト入力欄のデザイン修正 */
+.form-textfield {
+  display: block;
+  width: 100%;
+  
+  /* ★追加: 入力欄自体の角を丸める */
+  border-radius: 4px; 
+}
+
+/* フォーム内のグループ選択ボックス */
+.form-select {
+  /* ... (既存のプロパティ) ... */
+  border-radius: 4px; /* ★追加: 角丸 */
+}
+
+
+/* ▼▼▼ 3. ダイアログ（Modal）のコンテンツ自体のスタイル調整 ▼▼▼ */
+/* dialog.tsx で定義されているクラスに対応するCSS調整 */
+
+/* ダイアログの中身（白い箱部分） */
+[data-state="open"] .fixed.z-50.grid {
+  /* ★追加: ダイアログの角を丸くする */
+  border-radius: 8px !important; 
+  
+  /* ★追加: ダイアログの内側に余白を持たせる */
+  padding: 24px !important;
+  
+  /* ★追加: ダイアログの左右にも少し余裕を持たせる（画面幅いっぱいにならないように） */
+  max-width: calc(100% - 40px) !important; 
+}
 
 /* スニペットリスト全体のコンテナ */
 .snippet-list {
