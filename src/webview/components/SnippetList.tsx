@@ -19,7 +19,6 @@ export const AccordionIcon = ({ isOpen }: { isOpen: boolean }) => (
   </span>
 );
 
-// ▼▼▼【ここから変更】▼▼▼
 interface SnippetItemProps {
   snippet: Snippet;
   onRunSnippet: (snippet: Snippet) => void;
@@ -74,11 +73,9 @@ export const SnippetItem: React.FC<SnippetItemProps> = ({
         onClick={() => onRunSnippet(snippet)}>
         {snippet.name}
       </Button>
-      {/* MeatballMenuコンポーネントはここから削除 */}
     </div>
   );
 };
-// ▲▲▲【ここまで変更】▲▲▲
 
 // propsからdrag関連の型を除外
 const SortableSnippetItem: React.FC<Omit<SnippetItemProps, "dragAttributes" | "dragListeners">> = (
@@ -122,7 +119,6 @@ interface SnippetListProps {
   onDeleteGroup: (groupId: string) => void;
 }
 
-// ▼▼▼【ここから変更】▼▼▼
 const SnippetList: React.FC<SnippetListProps> = ({
   groups,
   snippets,
@@ -158,7 +154,6 @@ const SnippetList: React.FC<SnippetListProps> = ({
     };
   }, []);
 
-  // ▼▼▼【ここから追加】▼▼▼
   const handleEditSnippetClick = (snippet: Snippet, groupId?: string) => {
     onEditSnippet(snippet, groupId); // 1. 元の編集関数を呼び出す
     setActiveMenuId(null); // 2. メニューを閉じる
@@ -168,7 +163,6 @@ const SnippetList: React.FC<SnippetListProps> = ({
     onEditGroup(group); // 1. 元の編集関数を呼び出す
     setActiveMenuId(null); // 2. メニューを閉じる
   };
-  // ▲▲▲【ここまで追加】▲▲▲
 
   if (groups.length === 0 && snippets.length === 0) {
     return <p>スニペットはまだありません</p>;
@@ -186,41 +180,45 @@ const SnippetList: React.FC<SnippetListProps> = ({
             isOpen={!!openGroups[group.id]}
             onToggle={toggleGroup}
             onRunSnippet={onRunSnippet}
-            onEditSnippet={handleEditSnippetClick} // 変更
+            onEditSnippet={handleEditSnippetClick}
             onDeleteSnippet={onDeleteSnippet}
-            onEditGroup={handleEditGroupClick} // 変更
+            onEditGroup={handleEditGroupClick}
             onDeleteGroup={onDeleteGroup}
             isMenuOpen={activeMenuId === group.id}
             onMenuToggle={(e) => handleMenuToggle(group.id, e)}
-            // ▼▼▼【ここから追加】▼▼▼
             activeMenuId={activeMenuId}
             handleMenuToggle={handleMenuToggle}
-            // ▲▲▲【ここまで追加】▲▲▲
           />
         ))}
       </SortableContext>
+
+      {/* ▼▼▼【ここを追加】グループとスニペットの両方がある場合のみ間隔を空ける ▼▼▼ */}
+      {groups.length > 0 && snippets.length > 0 && (
+        <div style={{ height: "8px" }} /> 
+      )}
+      {/* ▲▲▲【ここまで追加】高さ(height)の値で間隔を調整してください ▲▲▲ */}
 
       <SortableContext
         items={snippets.map((s) => s.id)}
         strategy={verticalListSortingStrategy}>
-        {snippets.map((snippet) => (
-          <SortableSnippetItem
-            key={snippet.id}
-            snippet={snippet}
-            onRunSnippet={onRunSnippet}
-            onEditSnippet={handleEditSnippetClick} // 変更
-            onDeleteSnippet={onDeleteSnippet}
-            isMenuOpen={activeMenuId === snippet.id}
-            onMenuToggle={(e) => handleMenuToggle(snippet.id, e)}
-          />
-        ))}
+        <div className="non-grouped-container">
+          {snippets.map((snippet) => (
+            <SortableSnippetItem
+              key={snippet.id}
+              snippet={snippet}
+              onRunSnippet={onRunSnippet}
+              onEditSnippet={handleEditSnippetClick}
+              onDeleteSnippet={onDeleteSnippet}
+              isMenuOpen={activeMenuId === snippet.id}
+              onMenuToggle={(e) => handleMenuToggle(snippet.id, e)}
+            />
+         ))}
+        </div>
       </SortableContext>
     </div>
   );
 };
-// ▲▲▲【ここまで変更】▲▲▲
 
-// ▼▼▼【ここから変更】▼▼▼
 interface SortableGroupProps {
   group: Group;
   isOpen: boolean;
@@ -232,10 +230,8 @@ interface SortableGroupProps {
   onDeleteGroup: (groupId: string) => void;
   isMenuOpen: boolean;
   onMenuToggle: (e: React.MouseEvent) => void;
-  // ▼▼▼【ここから追加】▼▼▼
   activeMenuId: string | null;
   handleMenuToggle: (id: string, e: React.MouseEvent) => void;
-  // ▲▲▲【ここまで追加】▲▲▲
 }
 
 const SortableGroup: React.FC<SortableGroupProps> = ({
@@ -249,12 +245,9 @@ const SortableGroup: React.FC<SortableGroupProps> = ({
   onDeleteGroup,
   isMenuOpen,
   onMenuToggle,
-  // ▼▼▼【ここから追加】▼▼▼
   activeMenuId,
   handleMenuToggle,
-  // ▲▲▲【ここまで追加】▲▲▲
 }) => {
-// ▲▲▲【ここまで変更】▲▲▲
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
     useSortable({
       id: group.id,
@@ -297,7 +290,6 @@ const SortableGroup: React.FC<SortableGroupProps> = ({
         </div>
         <AccordionIcon isOpen={isOpen} />
         <span className="group-name">{group.groupName}</span>
-        {/* MeatballMenuのコンテナはここから削除 */}
       </div>
       {isOpen && (
         <div className="group-snippets">
@@ -313,10 +305,8 @@ const SortableGroup: React.FC<SortableGroupProps> = ({
                   onEditSnippet={onEditSnippet}
                   onDeleteSnippet={onDeleteSnippet}
                   groupId={group.id}
-                  // ▼▼▼【ここから変更】▼▼▼
                   isMenuOpen={activeMenuId === snippet.id}
                   onMenuToggle={(e) => handleMenuToggle(snippet.id, e)}
-                  // ▲▲▲【ここまで変更】▲▲▲
                 />
               ))
             ) : (
@@ -330,6 +320,5 @@ const SortableGroup: React.FC<SortableGroupProps> = ({
     </div>
   );
 };
-// ▲▲▲【ここまで変更】▲▲▲
 
 export default SnippetList;

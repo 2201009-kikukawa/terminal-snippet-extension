@@ -2,7 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ▼▼▼【ここから追加】▼▼▼ */
 /* shadcn/ui のためのCSS変数 (VSCodeのテーマに合わせる) */
 :root {
   --background: var(--vscode-sideBar-background);
@@ -35,7 +34,101 @@
  
   --radius: 0.5rem;
 }
-/* ▲▲▲ 追加ここまで ▲▲▲ */
+
+/* ▼▼▼ 1. 全体のレイアウトと余白の修正 ▼▼▼ */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden; 
+}
+
+/* bodyに勝手につくpaddingを打ち消す */
+body[style] {
+  padding-right: 0 !important;
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  
+  /* ★重要: ここでサイドバー全体の「左右の隙間」を作ります */
+  padding: 20px 10px; 
+  box-sizing: border-box; /* paddingを含めたサイズ計算にする */
+}
+
+/* スクロールバーのデザイン調整（前回の内容を維持） */
+#root::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+#root::-webkit-scrollbar-thumb {
+  background-color: var(--vscode-scrollbarSlider-background);
+  border-radius: 5px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+#root::-webkit-scrollbar-thumb:hover {
+  background-color: var(--vscode-scrollbarSlider-hoverBackground);
+}
+#root::-webkit-scrollbar-thumb:active {
+  background-color: var(--vscode-scrollbarSlider-activeBackground);
+}
+
+/* ▼▼▼ 追加: 中央揃えと幅調整のための共通設定 ▼▼▼ */
+/* 追加ボタン、検索バー、リストを同じ幅で中央に揃える */
+.add-button-container,
+.search-bar-container,
+.snippet-list {
+  width: 88%; /* 幅を少し小さく */
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 600px; /* ワイド画面での広がりすぎ防止 */
+}
+
+/* ▼▼▼ 2. フォーム（ダイアログ）のデザイン修正 ▼▼▼ */
+
+/* フォーム全体のコンテナ */
+.form-container {
+  margin-top: 1em;
+  border: 1px solid var(--vscode-input-border);
+  padding: 1em;
+  border-radius: 5px; /* 既存の設定ですが念のため */
+}
+
+/* テキスト入力欄のデザイン修正 */
+.form-textfield {
+  display: block;
+  width: 100%;
+  
+  /* ★追加: 入力欄自体の角を丸める */
+  border-radius: 4px; 
+}
+
+/* フォーム内のグループ選択ボックス */
+.form-select {
+  /* ... (既存のプロパティ) ... */
+  border-radius: 4px; /* ★追加: 角丸 */
+}
+
+
+/* ▼▼▼ 3. ダイアログ（Modal）のコンテンツ自体のスタイル調整 ▼▼▼ */
+/* dialog.tsx で定義されているクラスに対応するCSS調整 */
+
+/* ダイアログの中身（白い箱部分） */
+[data-state="open"] .fixed.z-50.grid {
+  /* ★追加: ダイアログの角を丸くする */
+  border-radius: 8px !important; 
+  
+  /* ★追加: ダイアログの内側に余白を持たせる */
+  padding: 24px !important;
+  
+  /* ★追加: ダイアログの左右にも少し余裕を持たせる（画面幅いっぱいにならないように） */
+  max-width: calc(100% - 40px) !important; 
+}
 
 /* スニペットリスト全体のコンテナ */
 .snippet-list {
@@ -43,6 +136,15 @@
   flex-direction: column;
   gap: 0.5em;
   margin-bottom: 1em;
+}
+
+/* ▼▼▼【修正】グループ内のスニペットを右にずらして階層を表現 ▼▼▼ */
+.group-snippets {
+  padding-left: 20px; 
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 4px;
 }
 
 /* 検索バーのコンテナ */
@@ -95,11 +197,12 @@
 
 
 /* スニペット一行全体のコンテナ */
-.snippet-item {
+.snippet-item,
+.group-header {
+  position: relative; /* 絶対配置の基準点 */
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.5em;
+  /* gapは削除（ハンドルが浮くため） */
 }
 
 /* スニペット名を表示するボタン */
@@ -108,26 +211,22 @@
   text-align: left;
 }
 
-/* グループのヘッダー */
-.group-header {
-  display: flex;
-  align-items: center;
-  width: 100%;
-}
-
 /* グループ名 */
 .group-header .group-name {
-  flex-grow: 1; /* スペースを埋めて右端にメニューを配置 */
+  flex-grow: 1;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis; /* 長い名前は省略 */
+  text-overflow: ellipsis;
+  /* 左padding不要（ハンドルが外に出るため、左端が揃う） */
 }
 
-/* グループのミートボールメニューコンテナ */
-.group-header .meatball-menu-container {
-  flex-shrink: 0; /* 縮まないように設定 */
+.non-grouped-container {
+  /* スニペットリストの基本的なスタイル（縦並びと間隔）を維持 */
+  display: flex;
+  flex-direction: column;
+  /* 親の.snippet-listのgap (0.5em) をここで再定義して間隔を維持 */
+  gap: 0.5em; 
 }
-
 
 /* フォーム全体のコンテナ */
 .form-container {
@@ -220,13 +319,15 @@
 
 /* ドラッグハンドル */
 .drag-handle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 8px;
+  margin-right: 0; /* マージン不要 */
   color: var(--vscode-foreground);
   opacity: 0.6;
-  cursor: grab; /* カーソルを掴む形に変更 */
+  cursor: grab;
+  
+  /* ホバー時の表示制御 */
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.2s, visibility 0.2s;
 }
 
 .drag-handle:hover {
@@ -250,23 +351,31 @@
 
 /* ドラッグハンドルとコンテキストメニューのコンテナ */
 .drag-handle-container {
-  position: relative;
+  position: absolute;
+  left: -24px; /* 親要素の左端より外側(左)に配置 */
+  top: 50%;
+  transform: translateY(-50%); /* 上下中央揃え */
+  
   display: flex;
   align-items: center;
+  justify-content: center;
+  width: 20px; /* クリックしやすい幅を確保 */
+  height: 100%;
+  z-index: 5; /* コンテンツより前面に */
 }
 
 /* コンテキストメニューのスタイル */
 .context-menu {
   position: absolute;
-  top: 100%; /* ハンドルの真下に表示 */
-  left: 0;
-  z-index: 10;
+  top: 80%; /* ハンドルの少し下 */
+  left: 0;  /* ハンドルの左端に合わせる */
+  z-index: 20; /* 最前面 */
   background-color: var(--vscode-dropdown-background);
   border: 1px solid var(--vscode-dropdown-border);
   border-radius: 4px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   padding: 4px;
-  min-width: 80px; /* メニューの最小幅 */
+  min-width: 80px;
 }
 
 /* コンテキストメニューの各項目のスタイル */
