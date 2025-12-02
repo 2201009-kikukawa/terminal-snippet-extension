@@ -56,7 +56,7 @@ body[style] {
   position: relative;
   
   /* ★重要: ここでサイドバー全体の「左右の隙間」を作ります */
-  padding: 20px; 
+  padding: 20px 10px; 
   box-sizing: border-box; /* paddingを含めたサイズ計算にする */
 }
 
@@ -78,6 +78,16 @@ body[style] {
   background-color: var(--vscode-scrollbarSlider-activeBackground);
 }
 
+/* ▼▼▼ 追加: 中央揃えと幅調整のための共通設定 ▼▼▼ */
+/* 追加ボタン、検索バー、リストを同じ幅で中央に揃える */
+.add-button-container,
+.search-bar-container,
+.snippet-list {
+  width: 88%; /* 幅を少し小さく */
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 600px; /* ワイド画面での広がりすぎ防止 */
+}
 
 /* ▼▼▼ 2. フォーム（ダイアログ）のデザイン修正 ▼▼▼ */
 
@@ -130,16 +140,12 @@ body[style] {
 
 /* ▼▼▼【修正】グループ内のスニペットを右にずらして階層を表現 ▼▼▼ */
 .group-snippets {
-  /* 左側に20pxの余白を作り、中身を右にずらす */
   padding-left: 20px; 
-  
-  /* 以下はリストの並びを整えるための設定 */
   display: flex;
   flex-direction: column;
-  gap: 4px;      /* スニペット同士の間隔を少し狭めて一体感を出す */
-  margin-top: 4px; /* グループ名との間隔 */
+  gap: 6px;
+  margin-top: 4px;
 }
-/* ▲▲▲ 修正ここまで ▲▲▲ */
 
 /* 検索バーのコンテナ */
 .search-bar-container {
@@ -191,11 +197,12 @@ body[style] {
 
 
 /* スニペット一行全体のコンテナ */
-.snippet-item {
+.snippet-item,
+.group-header {
+  position: relative; /* 絶対配置の基準点 */
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.5em;
+  /* gapは削除（ハンドルが浮くため） */
 }
 
 /* スニペット名を表示するボタン */
@@ -204,26 +211,22 @@ body[style] {
   text-align: left;
 }
 
-/* グループのヘッダー */
-.group-header {
-  display: flex;
-  align-items: center;
-  width: 100%;
-}
-
 /* グループ名 */
 .group-header .group-name {
-  flex-grow: 1; /* スペースを埋めて右端にメニューを配置 */
+  flex-grow: 1;
   white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis; /* 長い名前は省略 */
+  text-overflow: ellipsis;
+  /* 左padding不要（ハンドルが外に出るため、左端が揃う） */
 }
 
-/* グループのミートボールメニューコンテナ */
-.group-header .meatball-menu-container {
-  flex-shrink: 0; /* 縮まないように設定 */
+.non-grouped-container {
+  /* スニペットリストの基本的なスタイル（縦並びと間隔）を維持 */
+  display: flex;
+  flex-direction: column;
+  /* 親の.snippet-listのgap (0.5em) をここで再定義して間隔を維持 */
+  gap: 0.5em; 
 }
-
 
 /* フォーム全体のコンテナ */
 .form-container {
@@ -316,13 +319,15 @@ body[style] {
 
 /* ドラッグハンドル */
 .drag-handle {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 8px;
+  margin-right: 0; /* マージン不要 */
   color: var(--vscode-foreground);
   opacity: 0.6;
-  cursor: grab; /* カーソルを掴む形に変更 */
+  cursor: grab;
+  
+  /* ホバー時の表示制御 */
+  visibility: hidden;
+  opacity: 0;
+  transition: opacity 0.2s, visibility 0.2s;
 }
 
 .drag-handle:hover {
@@ -346,23 +351,31 @@ body[style] {
 
 /* ドラッグハンドルとコンテキストメニューのコンテナ */
 .drag-handle-container {
-  position: relative;
+  position: absolute;
+  left: -24px; /* 親要素の左端より外側(左)に配置 */
+  top: 50%;
+  transform: translateY(-50%); /* 上下中央揃え */
+  
   display: flex;
   align-items: center;
+  justify-content: center;
+  width: 20px; /* クリックしやすい幅を確保 */
+  height: 100%;
+  z-index: 5; /* コンテンツより前面に */
 }
 
 /* コンテキストメニューのスタイル */
 .context-menu {
   position: absolute;
-  top: 100%; /* ハンドルの真下に表示 */
-  left: 0;
-  z-index: 10;
+  top: 80%; /* ハンドルの少し下 */
+  left: 0;  /* ハンドルの左端に合わせる */
+  z-index: 20; /* 最前面 */
   background-color: var(--vscode-dropdown-background);
   border: 1px solid var(--vscode-dropdown-border);
   border-radius: 4px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   padding: 4px;
-  min-width: 80px; /* メニューの最小幅 */
+  min-width: 80px;
 }
 
 /* コンテキストメニューの各項目のスタイル */
