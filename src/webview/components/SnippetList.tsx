@@ -42,6 +42,8 @@ export const SnippetItem: React.FC<SnippetItemProps> = ({
   isMenuOpen,
   onMenuToggle,
 }) => {
+  const [showTooltip, setShowTooltip] = useState(false);
+
   return (
     <div className="snippet-item">
       <div className="drag-handle-container">
@@ -66,13 +68,30 @@ export const SnippetItem: React.FC<SnippetItemProps> = ({
           </div>
         )}
       </div>
-      <Button
-        appearance="secondary"
-        className="snippet-name-button"
-        title={snippet.command.join(" && ")}
-        onClick={() => onRunSnippet(snippet)}>
-        {snippet.name}
-      </Button>
+      {/* ▼ カスタムツールチップ */}
+      <div
+  className="tooltip-wrapper"
+  onMouseEnter={() => setShowTooltip(true)}
+  onMouseLeave={() => setShowTooltip(false)}
+  style={{ position: "relative" }}
+>
+  <Button
+    appearance="secondary"
+    className="snippet-name-button"
+    onClick={() => onRunSnippet(snippet)}
+  >
+    {snippet.name}
+  </Button>
+
+  {showTooltip && (
+    <div className="custom-tooltip">
+      {snippet.command.map((cmd, i) => (
+        <div key={i}>{`${i + 1}. ${cmd}`}</div>
+      ))}
+    </div>
+  )}
+</div>
+      {/* ▲ カスタムツールチップ */}
     </div>
   );
 };
