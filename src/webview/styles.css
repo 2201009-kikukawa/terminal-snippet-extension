@@ -205,8 +205,15 @@ body[style] {
   /* gapは削除（ハンドルが浮くため） */
 }
 
+/* ▼▼▼ 追加: グループヘッダーはクリックで開閉するためポインターを表示 ▼▼▼ */
+.group-header {
+  cursor: pointer;
+}
+/* ▲▲▲ 追加ここまで ▲▲▲ */
+
 /* スニペット名を表示するボタン */
 .snippet-name-button {
+  width: 100%;
   flex-grow: 1; /* スペースを埋めて右端にメニューを配置 */
   text-align: left;
 }
@@ -389,4 +396,25 @@ body[style] {
 /* メニュー項目にホバーした時のスタイル */
 .context-menu-item:hover {
   background-color: var(--vscode-list-hoverBackground);
+}
+
+/* --- VSCodeテーマに合わせたカスタムツールチップ --- */
+.custom-tooltip {
+  position: absolute;
+  top: 0;
+  left: 100%;
+  margin-left: -60px; /* ← 少し重ねたい場合（調整可） */
+  padding: 6px 8px;
+  background: var(--vscode-editorHoverWidget-background);
+  color: var(--vscode-editorHoverWidget-foreground);
+  border: 1px solid var(--vscode-editorHoverWidget-border);
+  white-space: pre;
+  z-index: 999;
+  border-radius: 4px;
+}
+
+.tooltip-wrapper {
+  width: 100%;
+  display: block;
+  position: relative; /* すでに指定済みなら不要 */
 }
