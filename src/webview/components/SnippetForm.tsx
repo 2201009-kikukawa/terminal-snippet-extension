@@ -133,6 +133,12 @@ const SnippetForm: React.FC<SnippetFormProps> = ({
       </div>
 
     <div className="form-group">
+      <div className="add-command-link-container">
+        <VSCodeLink href="#" onClick={handleAddAnotherCommand}>
+          続けて実行するコマンドを追加
+        </VSCodeLink>
+      </div>
+
       <div className="form-check-container" style={{ margin: "2px 0" }}>
         <VSCodeCheckbox
           checked={isEdit}
@@ -140,12 +146,6 @@ const SnippetForm: React.FC<SnippetFormProps> = ({
         >
           実行前に編集する
         </VSCodeCheckbox>
-      </div>
-
-      <div className="add-command-link-container">
-        <VSCodeLink href="#" onClick={handleAddAnotherCommand}>
-          続けて実行するコマンドを追加
-        </VSCodeLink>
       </div>
     </div>
 

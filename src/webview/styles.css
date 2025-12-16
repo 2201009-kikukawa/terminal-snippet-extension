@@ -304,7 +304,9 @@ body[style] {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1px solid var(--vscode-errorForeground);
+  background-color: #ffffff;      /* 中は白 */
+  color: #000000;                 /* －は黒 */
+  border: 1px solid #000000;      /* 枠線は黒 */
   border-radius: 50%;
 }
 
@@ -417,4 +419,13 @@ body[style] {
   width: 100%;
   display: block;
   position: relative; /* すでに指定済みなら不要 */
+}
+
+/* フォームのラベル */
+.form-group label {
+  display: block;          /* 入力欄と縦に並べる */
+  margin-bottom: 6px;      /* ラベルと入力欄の間の余白 */
+  font-size: 14px;         /* 入力値より小さく */
+  font-weight: 600;        /* 太字（強すぎない） */
+  color: var(--vscode-foreground);
 }
