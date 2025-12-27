@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { VSCodeLink, VSCodeCheckbox } from "@vscode/webview-ui-toolkit/react";
+import type { CheckedState } from "@radix-ui/react-checkbox";
 import { TextField, Button } from "./common";
+import { Checkbox } from "./ui/checkbox";
 import { Snippet, Group } from "../types";
 
 interface SnippetFormProps {
@@ -12,7 +13,7 @@ interface SnippetFormProps {
 }
 
 const SnippetForm: React.FC<SnippetFormProps> = ({
-  onSubmit, 
+  onSubmit,
   onUpdate,
   onCancel,
   groups,
@@ -75,7 +76,7 @@ const SnippetForm: React.FC<SnippetFormProps> = ({
   };
 
   // ★ コマンド入力欄を追加する関数
-  const handleAddAnotherCommand = (e: React.MouseEvent) => {
+  const handleAddAnotherCommand = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     setCommands([...commands, ""]);
   };
@@ -98,9 +99,7 @@ const SnippetForm: React.FC<SnippetFormProps> = ({
   return (
     <div>
       <div className="form-group">
-        <label>
-          名前
-        </label>
+        <label>名前</label>
         <TextField
           value={name}
           placeholder="スニペット名"
@@ -111,9 +110,7 @@ const SnippetForm: React.FC<SnippetFormProps> = ({
       </div>
 
       <div className="form-group">
-        <label>
-          コマンド
-        </label>
+        <label>コマンド</label>
         {commands.map((command, index) => (
           <div key={index} className="command-input-container">
             <TextField
@@ -123,7 +120,10 @@ const SnippetForm: React.FC<SnippetFormProps> = ({
               onInput={(e) => handleCommandChange(index, (e.target as HTMLInputElement).value)}
             />
             {commands.length > 1 && (
-              <Button onClick={() => handleRemoveCommand(index)} appearance="icon" className="remove-command-button">
+              <Button
+                onClick={() => handleRemoveCommand(index)}
+                appearance="icon"
+                className="remove-command-button">
                 ー
               </Button>
             )}
@@ -132,37 +132,38 @@ const SnippetForm: React.FC<SnippetFormProps> = ({
         {commandError && <p className="error-message">{commandError}</p>}
       </div>
 
-    <div className="form-group">
-      <div className="add-command-link-container">
-        <VSCodeLink href="#" onClick={handleAddAnotherCommand}>
-          続けて実行するコマンドを追加
-        </VSCodeLink>
+      <div className="form-group">
+        <div className="add-command-link-container">
+          <Button appearance="link" onClick={handleAddAnotherCommand}>
+            続けて実行するコマンドを追加
+          </Button>
+        </div>
+
+        <div className="form-check-container" style={{ margin: "2px 0" }}>
+          <label className="flex items-center gap-2 text-sm text-[var(--foreground)]">
+            <Checkbox
+              id="snippet-is-edit"
+              checked={isEdit}
+              onCheckedChange={(checked: CheckedState) => setIsEdit(checked === true)}
+            />
+            実行前に編集する
+          </label>
+        </div>
       </div>
 
-      <div className="form-check-container" style={{ margin: "2px 0" }}>
-        <VSCodeCheckbox
-          checked={isEdit}
-          onChange={(e: any) => setIsEdit(e.target.checked)}
-        >
-          実行前に編集する
-        </VSCodeCheckbox>
+      <div className="form-group">
+        <select
+          value={selectedGroupId}
+          onChange={(e) => setSelectedGroupId(e.target.value)}
+          className="form-select">
+          <option value="">グループなし</option>
+          {groups.map((group) => (
+            <option key={group.id} value={group.id}>
+              {group.groupName}
+            </option>
+          ))}
+        </select>
       </div>
-    </div>
-
-    <div className="form-group">
-      <select
-        value={selectedGroupId}
-        onChange={(e) => setSelectedGroupId(e.target.value)}
-        className="form-select"
-      >
-        <option value="">グループなし</option>
-        {groups.map((group) => (
-          <option key={group.id} value={group.id}>
-            {group.groupName}
-          </option>
-        ))}
-      </select>
-    </div>
 
       <div className="form-actions">
         <Button onClick={handleSubmit}>{isEditing ? "更新" : "登録"}</Button>

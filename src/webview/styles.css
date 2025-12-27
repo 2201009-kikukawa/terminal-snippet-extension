@@ -9,38 +9,41 @@
 
   --card: var(--vscode-input-background);
   --card-foreground: var(--vscode-input-foreground);
- 
+
   --popover: var(--vscode-menu-background);
   --popover-foreground: var(--vscode-menu-foreground);
- 
+
   --primary: var(--vscode-button-background);
   --primary-foreground: var(--vscode-button-foreground);
- 
+
   --secondary: var(--vscode-button-secondaryBackground);
   --secondary-foreground: var(--vscode-button-secondaryForeground);
- 
-  --muted: var(--vscode-disabledForeground); /* VSCodeに直接対応するものがないため、近い色を割り当て */
+
+  --muted: var(
+    --vscode-disabledForeground
+  ); /* VSCodeに直接対応するものがないため、近い色を割り当て */
   --muted-foreground: var(--vscode-disabledForeground);
- 
+
   --accent: var(--vscode-focusBorder); /* フォーカス色をアクセントに */
   --accent-foreground: var(--vscode-foreground);
- 
+
   --destructive: var(--vscode-errorForeground);
   --destructive-foreground: var(--vscode-foreground); /* エラー時のテキスト色（適宜調整）*/
 
   --border: var(--vscode-input-border);
   --input: var(--vscode-input-border);
   --ring: var(--vscode-focusBorder);
- 
+
   --radius: 0.5rem;
 }
 
 /* ▼▼▼ 1. 全体のレイアウトと余白の修正 ▼▼▼ */
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden; 
+  overflow: hidden;
 }
 
 /* bodyに勝手につくpaddingを打ち消す */
@@ -54,9 +57,9 @@ body[style] {
   overflow-y: auto;
   overflow-x: hidden;
   position: relative;
-  
+
   /* ★重要: ここでサイドバー全体の「左右の隙間」を作ります */
-  padding: 20px 10px; 
+  padding: 20px 10px;
   box-sizing: border-box; /* paddingを含めたサイズ計算にする */
 }
 
@@ -103,9 +106,10 @@ body[style] {
 .form-textfield {
   display: block;
   width: 100%;
-  
+  box-sizing: border-box;
+
   /* ★追加: 入力欄自体の角を丸める */
-  border-radius: 4px; 
+  border-radius: 4px;
 }
 
 /* フォーム内のグループ選択ボックス */
@@ -114,20 +118,19 @@ body[style] {
   border-radius: 4px; /* ★追加: 角丸 */
 }
 
-
 /* ▼▼▼ 3. ダイアログ（Modal）のコンテンツ自体のスタイル調整 ▼▼▼ */
 /* dialog.tsx で定義されているクラスに対応するCSS調整 */
 
 /* ダイアログの中身（白い箱部分） */
 [data-state="open"] .fixed.z-50.grid {
   /* ★追加: ダイアログの角を丸くする */
-  border-radius: 8px !important; 
-  
+  border-radius: 8px !important;
+
   /* ★追加: ダイアログの内側に余白を持たせる */
   padding: 24px !important;
-  
+
   /* ★追加: ダイアログの左右にも少し余裕を持たせる（画面幅いっぱいにならないように） */
-  max-width: calc(100% - 40px) !important; 
+  max-width: calc(100% - 40px) !important;
 }
 
 /* スニペットリスト全体のコンテナ */
@@ -140,7 +143,7 @@ body[style] {
 
 /* ▼▼▼【修正】グループ内のスニペットを右にずらして階層を表現 ▼▼▼ */
 .group-snippets {
-  padding-left: 20px; 
+  padding-left: 20px;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -152,7 +155,6 @@ body[style] {
   margin-top: 8px;
   margin-bottom: 8px;
 }
-
 
 /* スニペット追加ボタンとドロップダウンのコンテナ */
 .add-button-container {
@@ -195,7 +197,6 @@ body[style] {
   border-radius: 3px;
 }
 
-
 /* スニペット一行全体のコンテナ */
 .snippet-item,
 .group-header {
@@ -232,7 +233,7 @@ body[style] {
   display: flex;
   flex-direction: column;
   /* 親の.snippet-listのgap (0.5em) をここで再定義して間隔を維持 */
-  gap: 0.5em; 
+  gap: 0.5em;
 }
 
 /* フォーム全体のコンテナ */
@@ -252,6 +253,7 @@ body[style] {
 .form-textfield {
   display: block;
   width: 100%;
+  box-sizing: border-box;
 }
 
 /* 検索バーの入力欄 */
@@ -274,6 +276,7 @@ body[style] {
   font-size: 1em;
   font-family: inherit;
   outline: none;
+  box-sizing: border-box;
 }
 
 /* セレクトボックスがフォーカスされた時のスタイル */
@@ -304,9 +307,9 @@ body[style] {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #ffffff;      /* 中は白 */
-  color: #000000;                 /* －は黒 */
-  border: 1px solid #000000;      /* 枠線は黒 */
+  background-color: #ffffff; /* 中は白 */
+  color: #000000; /* －は黒 */
+  border: 1px solid #000000; /* 枠線は黒 */
   border-radius: 50%;
 }
 
@@ -325,14 +328,13 @@ body[style] {
   margin-top: 4px;
 }
 
-
 /* ドラッグハンドル */
 .drag-handle {
   margin-right: 0; /* マージン不要 */
   color: var(--vscode-foreground);
   opacity: 0.6;
   cursor: grab;
-  
+
   /* ホバー時の表示制御 */
   visibility: hidden;
   opacity: 0;
@@ -364,7 +366,7 @@ body[style] {
   left: -24px; /* 親要素の左端より外側(左)に配置 */
   top: 50%;
   transform: translateY(-50%); /* 上下中央揃え */
-  
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -377,7 +379,7 @@ body[style] {
 .context-menu {
   position: absolute;
   top: 80%; /* ハンドルの少し下 */
-  left: 0;  /* ハンドルの左端に合わせる */
+  left: 0; /* ハンドルの左端に合わせる */
   z-index: 20; /* 最前面 */
   background-color: var(--vscode-dropdown-background);
   border: 1px solid var(--vscode-dropdown-border);
@@ -423,9 +425,9 @@ body[style] {
 
 /* フォームのラベル */
 .form-group label {
-  display: block;          /* 入力欄と縦に並べる */
-  margin-bottom: 6px;      /* ラベルと入力欄の間の余白 */
-  font-size: 14px;         /* 入力値より小さく */
-  font-weight: 600;        /* 太字（強すぎない） */
+  display: block; /* 入力欄と縦に並べる */
+  margin-bottom: 6px; /* ラベルと入力欄の間の余白 */
+  font-size: 14px; /* 入力値より小さく */
+  font-weight: 600; /* 太字（強すぎない） */
   color: var(--vscode-foreground);
 }
