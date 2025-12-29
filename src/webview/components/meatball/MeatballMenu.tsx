@@ -1,9 +1,9 @@
-import { VSCodeOption } from "@vscode/webview-ui-toolkit/react";
 import * as React from "react";
 import { useMeatballMenu } from "./MeatballMenuContext";
 import { MenuItem } from "../../types";
 import { DATA_MENU_AREA } from "./MeatballMenuContext";
 import { VSCODE_THEME_COLORS } from "../../const/VscodeColor";
+import Option from "../common/Option";
 
 interface MeatballMenuProps {
   id: string;
@@ -45,18 +45,15 @@ const MeatballMenu: React.FC<MeatballMenuProps> = ({ id, menuItems }) => {
             padding: "4px 0",
           }}>
           {menuItems.map((item, index) => (
-            <VSCodeOption
+            <Option
               key={index}
-              style={{
-                width: "100%",
-                justifyContent: "center",
-              }}
+              className="justify-center"
               onClick={() => {
                 item.onClick();
                 closeMenu();
               }}>
               {item.label}
-            </VSCodeOption>
+            </Option>
           ))}
         </div>
       )}

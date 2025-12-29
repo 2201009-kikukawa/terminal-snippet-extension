@@ -1,22 +1,12 @@
 import React from "react";
-import { VSCodeTextField } from "@vscode/webview-ui-toolkit/react";
+import { Input, type InputProps } from "../ui/input";
 
-interface TextFieldProps {
-  value: string;
-  placeholder: string;
-  onInput: (e: any) => void;
-  className?: string;
-}
+type TextFieldProps = InputProps;
 
-const TextField: React.FC<TextFieldProps> = ({ value, placeholder, onInput, className }) => {
-  return (
-    <VSCodeTextField
-      value={value}
-      placeholder={placeholder}
-      className={className}
-      onInput={onInput}
-    />
-  );
-};
+const TextField = React.forwardRef<HTMLInputElement, TextFieldProps>((props, ref) => {
+  return <Input ref={ref} {...props} />;
+});
+
+TextField.displayName = "TextField";
 
 export default TextField;
