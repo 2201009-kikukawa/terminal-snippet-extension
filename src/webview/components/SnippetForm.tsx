@@ -146,7 +146,7 @@ const SnippetForm: React.FC<SnippetFormProps> = ({
               checked={isEdit}
               onCheckedChange={(checked: CheckedState) => setIsEdit(checked === true)}
             />
-            実行前に編集する
+            <span>実行前に編集する</span>
           </label>
         </div>
       </div>

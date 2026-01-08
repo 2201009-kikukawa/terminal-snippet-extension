@@ -435,3 +435,25 @@ body[style] {
   font-weight: 600; /* 太字（強すぎない） */
   color: var(--vscode-foreground);
 }
+
+/* チェックボックスコンテナ */
+.form-check-container label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 0;
+  font-weight: normal;
+  line-height: 1;
+}
+
+.form-check-container label span {
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+
+.form-check-container label [role="checkbox"] {
+  margin-top: 0;
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
