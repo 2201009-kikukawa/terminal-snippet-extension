@@ -55,14 +55,10 @@ export const SnippetItem: React.FC<SnippetItemProps> = ({
         />
         {isMenuOpen && (
           <div className="context-menu">
-            <div
-              className="context-menu-item"
-              onClick={() => onEditSnippet(snippet, groupId)}>
+            <div className="context-menu-item" onClick={() => onEditSnippet(snippet, groupId)}>
               編集
             </div>
-            <div
-              className="context-menu-item"
-              onClick={() => onDeleteSnippet(snippet.id)}>
+            <div className="context-menu-item" onClick={() => onDeleteSnippet(snippet.id)}>
               削除
             </div>
           </div>
@@ -70,27 +66,25 @@ export const SnippetItem: React.FC<SnippetItemProps> = ({
       </div>
       {/* ▼ カスタムツールチップ */}
       <div
-  className="tooltip-wrapper"
-  onMouseEnter={() => setShowTooltip(true)}
-  onMouseLeave={() => setShowTooltip(false)}
-  style={{ position: "relative" }}
->
-  <Button
-    appearance="secondary"
-    className="snippet-name-button"
-    onClick={() => onRunSnippet(snippet)}
-  >
-    {snippet.name}
-  </Button>
+        className="tooltip-wrapper"
+        onMouseEnter={() => setShowTooltip(true)}
+        onMouseLeave={() => setShowTooltip(false)}
+        style={{ position: "relative" }}>
+        <Button
+          appearance="secondary"
+          className="snippet-name-button"
+          onClick={() => onRunSnippet(snippet)}>
+          {snippet.name}
+        </Button>
 
-  {showTooltip && (
-    <div className="custom-tooltip">
-      {snippet.command.map((cmd, i) => (
-        <div key={i}>{`${i + 1}. ${cmd}`}</div>
-      ))}
-    </div>
-  )}
-</div>
+        {showTooltip && (
+          <div className="custom-tooltip">
+            {snippet.command.map((cmd, i) => (
+              <div key={i}>{`${i + 1}. ${cmd}`}</div>
+            ))}
+          </div>
+        )}
+      </div>
       {/* ▲ カスタムツールチップ */}
     </div>
   );
@@ -154,12 +148,12 @@ const SnippetList: React.FC<SnippetListProps> = ({
   const toggleGroup = (groupId: string) => {
     setOpenGroups((prev) => ({ ...prev, [groupId]: !prev[groupId] }));
   };
-  
+
   const handleMenuToggle = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    setActiveMenuId(prevId => (prevId === id ? null : id));
+    setActiveMenuId((prevId) => (prevId === id ? null : id));
   };
-  
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       // メニューの外側をクリックしたときにメニューを閉じる
@@ -184,14 +178,12 @@ const SnippetList: React.FC<SnippetListProps> = ({
   };
 
   if (groups.length === 0 && snippets.length === 0) {
-    return <p>スニペットはまだありません</p>;
+    return <p className="text-center">スニペットはまだありません</p>;
   }
 
   return (
     <div className="snippet-list" ref={menuRef}>
-      <SortableContext
-        items={groups.map((g) => g.id)}
-        strategy={verticalListSortingStrategy}>
+      <SortableContext items={groups.map((g) => g.id)} strategy={verticalListSortingStrategy}>
         {groups.map((group) => (
           <SortableGroup
             key={group.id}
@@ -212,14 +204,10 @@ const SnippetList: React.FC<SnippetListProps> = ({
       </SortableContext>
 
       {/* ▼▼▼【ここを追加】グループとスニペットの両方がある場合のみ間隔を空ける ▼▼▼ */}
-      {groups.length > 0 && snippets.length > 0 && (
-        <div style={{ height: "8px" }} /> 
-      )}
+      {groups.length > 0 && snippets.length > 0 && <div style={{ height: "8px" }} />}
       {/* ▲▲▲【ここまで追加】高さ(height)の値で間隔を調整してください ▲▲▲ */}
 
-      <SortableContext
-        items={snippets.map((s) => s.id)}
-        strategy={verticalListSortingStrategy}>
+      <SortableContext items={snippets.map((s) => s.id)} strategy={verticalListSortingStrategy}>
         <div className="non-grouped-container">
           {snippets.map((snippet) => (
             <SortableSnippetItem
@@ -231,7 +219,7 @@ const SnippetList: React.FC<SnippetListProps> = ({
               isMenuOpen={activeMenuId === snippet.id}
               onMenuToggle={(e) => handleMenuToggle(snippet.id, e)}
             />
-         ))}
+          ))}
         </div>
       </SortableContext>
     </div>
@@ -267,13 +255,12 @@ const SortableGroup: React.FC<SortableGroupProps> = ({
   activeMenuId,
   handleMenuToggle,
 }) => {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
-    useSortable({
-      id: group.id,
-      data: {
-        type: "group",
-      },
-    });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: group.id,
+    data: {
+      type: "group",
+    },
+  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -294,14 +281,10 @@ const SortableGroup: React.FC<SortableGroupProps> = ({
           />
           {isMenuOpen && (
             <div className="context-menu" onClick={(e) => e.stopPropagation()}>
-              <div
-                className="context-menu-item"
-                onClick={() => onEditGroup(group)}>
+              <div className="context-menu-item" onClick={() => onEditGroup(group)}>
                 編集
               </div>
-              <div
-                className="context-menu-item"
-                onClick={() => onDeleteGroup(group.id)}>
+              <div className="context-menu-item" onClick={() => onDeleteGroup(group.id)}>
                 削除
               </div>
             </div>
@@ -329,9 +312,7 @@ const SortableGroup: React.FC<SortableGroupProps> = ({
                 />
               ))
             ) : (
-              <p className="no-snippets-in-group">
-                このグループにスニペットはありません
-              </p>
+              <p className="no-snippets-in-group">このグループにスニペットはありません</p>
             )}
           </SortableContext>
         </div>
