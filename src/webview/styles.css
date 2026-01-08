@@ -299,14 +299,18 @@ body[style] {
 }
 
 /* コマンド削除ボタン */
-.remove-command-button {
+.command-input-container .remove-command-button {
   margin-left: 5px;
-  min-width: 20px;
-  height: 20px;
-  padding: 0;
-  display: flex;
+  min-width: 24px !important;
+  max-width: 24px !important;
+  width: 24px !important;
+  height: 24px !important;
+  padding: 0 !important;
+  display: flex !important;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0 !important;
+  flex-grow: 0 !important;
   background-color: #ffffff; /* 中は白 */
   color: #000000; /* －は黒 */
   border: 1px solid #000000; /* 枠線は黒 */
